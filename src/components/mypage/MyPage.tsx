@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Styles from "./Dashboard.module.css";
 import { TaskList, NewTaskPopup, StatisticsPanel } from ".";
 
-const Dashboard: React.FC = () => {
+const MyPage: React.FC = () => {
   const [showPopup, setShowPopup] = useState(false);
 
   const mockTasks = [
@@ -38,4 +38,4 @@ const Dashboard: React.FC = () => {
   );
 };
 
-export default Dashboard;
+export default MyPage;
