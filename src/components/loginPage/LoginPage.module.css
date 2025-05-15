@@ -1,0 +1,80 @@
+.fullScreenBackground {
+    height: 100vh;
+    width: 100vw;
+    background-image: url('/poker.png'); 
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .loginWrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.0);
+    padding: 2rem;
+    width: 100%;
+    max-width: 500px;
+  }
+  
+  .loginHeader {
+    font-size: 2.5rem;
+    color: white;
+    margin-bottom: 2rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+    text-align: center;
+  }
+  
+  .loginBox {
+    background-color: rgba(255, 255, 255, 0.468);
+    border-radius: 8px;
+    padding: 2rem;
+    width: 100%;
+    color: black;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  }
+  
+  .formTitle {
+    margin-bottom: 1rem;
+    text-align: center;
+    color: black;
+  }
+  
+  .loginForm {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .loginForm input {
+    width: 100%;
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+  }
+  
+  .actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .actions button {
+    padding: 0.7rem;
+    font-size: 1rem;
+    background-color: #000;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .actions button:hover {
+    background-color: #333;
+  }
+  
