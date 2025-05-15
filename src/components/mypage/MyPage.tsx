@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Styles from "./Dashboard.module.css";
+import Styles from "./MyPage.module.css";
 import { TaskList, NewTaskPopup, StatisticsPanel } from ".";
 
 const MyPage: React.FC = () => {
@@ -12,7 +12,7 @@ const MyPage: React.FC = () => {
   ];
 
   return (
-    <div className={Styles.dashboardContainer}>
+    <div className={Styles.myPageContainer}>
       <div className={Styles.main}>
         <div className={Styles.taskSection}>
           <h2>Uppgifter i projektet</h2>
