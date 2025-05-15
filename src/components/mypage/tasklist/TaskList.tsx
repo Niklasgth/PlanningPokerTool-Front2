@@ -1,5 +1,5 @@
 import React from "react";
-import TaskCard from "../../mypage/taskCard/TaskCard";
+import TaskCard from "../taskCard/TaskCard";
 import Styles from "./TaskList.module.css";
 
 interface Task {
@@ -22,3 +22,5 @@ const TaskList: React.FC<TaskListProps> = ({ tasks }) => {
 };
 
 export default TaskList;
+
+//pushtest1
