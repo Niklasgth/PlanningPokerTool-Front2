@@ -2,7 +2,7 @@
 
 
 export { default as Dashboard } from "./MyPage";
-export { default as TaskList } from "../dashboard/taskList/TaskList";
+export { default as TaskList } from "./taskList/TaskList";
 export { default as TaskCard } from "./taskCard/TaskCard";
 export { default as NewTaskPopup } from "./newTaskPopup/NewTaskPopup";
 export { default as StatisticsPanel } from "./statisticsPanel/StatisticsPanel";

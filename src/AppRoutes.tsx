@@ -1,13 +1,14 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Dashboard from "./components/dashboard/Dashboard";
-
+import LoginPage from "./components/loginPage/LoginPage";
+import MyPage from "./components/mypage/MyPage";
 
 const AppRoutes: React.FC = () => {
   return (
     <Router>
       <Routes>
-      <Route path="/" element={<Dashboard />} />
+        <Route path="/" element={<LoginPage />} />
+        <Route path="/mypage" element={<MyPage />} />
       </Routes>
     </Router>
   );
