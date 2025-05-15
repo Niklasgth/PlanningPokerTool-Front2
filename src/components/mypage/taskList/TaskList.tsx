@@ -12,6 +12,10 @@ interface TaskListProps {
 }
 
 const TaskList: React.FC<TaskListProps> = ({ tasks }) => {
+  if (tasks.length === 0) {
+        return <div>No tasks found</div>
+    }
+
   return (
     <div className={Styles.taskList}>
       {tasks.map(task => (
@@ -22,5 +26,3 @@ const TaskList: React.FC<TaskListProps> = ({ tasks }) => {
 };
 
 export default TaskList;
-
-//pushtest1
