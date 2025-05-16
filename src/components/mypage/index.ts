@@ -1,7 +1,7 @@
 //indexfil som samlar alla exports
 
 
-export { default as Dashboard } from "./MyPage";
+export { default as MyPage } from "./MyPage";
 export { default as TaskList } from "./taskList/TaskList";
 export { default as TaskCard } from "./taskCard/TaskCard";
 export { default as NewTaskPopup } from "./newTaskPopup/NewTaskPopup";
