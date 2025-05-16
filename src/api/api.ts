@@ -5,7 +5,7 @@ export const api = axios.create({
 });
 
 export interface Task {
-    id: string;
+    id?: string;
     taskName: string;
     taskStory: string;
     taskDuration: number;
