@@ -1,15 +1,25 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Styles from "./MyPage.module.css";
 import { TaskList, NewTaskPopup, StatisticsPanel } from ".";
+import { getTasks } from "../../api/api";
+import type { Task } from "../../api/api";
 
 const MyPage: React.FC = () => {
   const [showPopup, setShowPopup] = useState(false);
+  const [tasks, setTasks] = useState<Task[]>([]);
 
-  const mockTasks = [
-    { id: "1", name: "Uppgift 1" },
-    { id: "2", name: "Uppgift 2" },
-    { id: "3", name: "Uppgift 3" },
-  ];
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        const response = await getTasks();
+        setTasks(response.data);
+      } catch (error) {
+        console.error("Kunde inte hämta tasks:", error);
+      }
+    };
+
+    fetchTasks();
+  }, []);
 
   return (
     <div className={Styles.myPageContainer}>
@@ -24,10 +34,9 @@ const MyPage: React.FC = () => {
             Skapa ny uppgift
           </button>
 
-          {/* Visar popupen bara då showPopup = true */}
           {showPopup && <NewTaskPopup onClose={() => setShowPopup(false)} />}
 
-          <TaskList tasks={mockTasks} />
+          <TaskList tasks={tasks} />
         </div>
 
         <div className={Styles.statisticsSection}>
