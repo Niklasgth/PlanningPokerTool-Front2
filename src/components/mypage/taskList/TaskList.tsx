@@ -14,9 +14,13 @@ const TaskList: React.FC<TaskListProps> = ({ tasks }) => {
 
   return (
     <div className={Styles.taskList}>
-      {tasks.map(task => (
-       <TaskCard key={task.id} task={task} />
-      ))}
+      {Array.isArray(tasks) ? (
+      tasks.map(task => (
+        <TaskCard key={task.id} task={task} />
+      ))
+    ) : (
+      <p>Inga uppgifter att visa.</p>
+    )}
     </div>
   );
 };
