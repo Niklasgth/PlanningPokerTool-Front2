@@ -8,17 +8,20 @@ const MyPage: React.FC = () => {
   const [showPopup, setShowPopup] = useState(false);
   const [tasks, setTasks] = useState<Task[]>([]);
 
-  useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        const response = await getTasks();
-        setTasks(response.data);
-      } catch (error) {
-        console.error("Kunde inte hämta tasks:", error);
-      }
-    };
+  //laddar in och fräshar upp tasklist. 
+  const refreshTasks = async () => {
+    try {
+      const response = await getTasks();
+      const data = Array.isArray(response.data) ? response.data : [];
+      setTasks(data);
+    } catch (error) {
+      console.error("Kunde inte hämta tasks:", error);
+      setTasks([]);
+    }
+  };
 
-    fetchTasks();
+  useEffect(() => {
+    refreshTasks(); 
   }, []);
 
   return (
@@ -34,7 +37,12 @@ const MyPage: React.FC = () => {
             Skapa ny uppgift
           </button>
 
-          {showPopup && <NewTaskPopup onClose={() => setShowPopup(false)} />}
+          {showPopup && (
+            <NewTaskPopup
+              onClose={() => setShowPopup(false)}
+              onTaskCreated={refreshTasks}
+            />
+          )}
 
           <TaskList tasks={tasks} />
         </div>

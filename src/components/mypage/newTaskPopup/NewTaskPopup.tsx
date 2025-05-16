@@ -3,12 +3,13 @@ import Styles from "./NewTaskPopup.module.css";
 import { createTask } from "../../../api/api";
 import type { Task } from "../../../api/api";
 
+
 interface NewTaskPopupProps {
   onClose: () => void;
+  onTaskCreated: () => void;
 }
 
-const NewTaskPopup: React.FC<NewTaskPopupProps> = ({ onClose }) => {
-  // ✅ Rätt: useState ligger nu inuti komponentfunktionen
+const NewTaskPopup: React.FC<NewTaskPopupProps> = ({ onClose, onTaskCreated }) => {
   const [taskName, setTaskName] = useState("");
 
   return (
@@ -31,17 +32,22 @@ const NewTaskPopup: React.FC<NewTaskPopupProps> = ({ onClose }) => {
               try {
                 const newTask: Task = {
                   taskName: taskName,
-                  taskStory: "Beskrivning här", 
+                  taskStory: "Beskrivning här",
                   taskDuration: 0,
-                  assignedUserId: "demo-user" 
+                  assignedUserId: "demo-user"
                 };
 
                 await createTask(newTask);
                 console.log("Uppgift skapad!");
+
+                onTaskCreated();
                 onClose();
               } catch (error) {
-                console.error("Fel vid skapande av uppgift:", error); } }}
-          > Skapa
+                console.error("Fel vid skapande av uppgift:", error);
+              }
+            }}
+          >
+            Skapa
           </button>
 
           <button onClick={onClose}>Avbryt</button>
@@ -50,5 +56,6 @@ const NewTaskPopup: React.FC<NewTaskPopupProps> = ({ onClose }) => {
     </div>
   );
 };
+
 
 export default NewTaskPopup;
