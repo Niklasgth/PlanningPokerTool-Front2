@@ -24,14 +24,14 @@ export interface TaskEstimate {
     estimatedDuration: number;
 }
 
-export const getTasks = () => api.get<Task[]>("/tasks");
-export const getTaskById = (id: string) => api.get<Task>(`/task/${id}`);
-export const createTask = (task: Task) => api.post<Task>("/task", task);
+export const getTasks = () => api.get<Task[]>("/api/tasks");
+export const getTaskById = (id: string) => api.get<Task>(`/api/task/${id}`);
+export const createTask = (task: Task) => api.post<Task>("/api/task", task);
 
-export const getUsers = () => api.get<User[]>("/users");
-export const getUserById = (id: string) => api.get<User>(`user/${id}`);
-export const createUser = (user: User) => api.post<User>("/user", user);
+export const getUsers = () => api.get<User[]>("/api/users");
+export const getUserById = (id: string) => api.get<User>(`/api/user/${id}`);
+export const createUser = (user: User) => api.post<User>("/api//user", user);
 
-export const getTaskEstimates = () => api.get<TaskEstimate[]>("/taskEstimates");
-export const getTaskEstimateById = (id: string) => api.get<TaskEstimate>(`/taskEstimate/${id}`);
-export const createTaskEstimate = (taskEstimate: TaskEstimate) => api.post<TaskEstimate>("/taskEstimate", taskEstimate);
+export const getTaskEstimates = () => api.get<TaskEstimate[]>("/api/taskEstimates");
+export const getTaskEstimateById = (id: string) => api.get<TaskEstimate>(`/api/taskEstimate/${id}`);
+export const createTaskEstimate = (taskEstimate: TaskEstimate) => api.post<TaskEstimate>("/api/taskEstimate", taskEstimate);
