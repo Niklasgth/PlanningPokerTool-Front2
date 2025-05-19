@@ -1,14 +1,18 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import DashboardPage from "./pages/DashboardPage";
-// import LoginPage from "@pages/LoginPage"; // om du skapar en sån
+import LoginPage from "./components/loginPage/LoginPage";
+import MyPage from "./components/mypage/MyPage";
+import RegisterPage from "./components/loginPage/RegisterPage";
+import PokerPage from "./components/pokerPage/PokerPage";
 
 const AppRoutes: React.FC = () => {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<div>Loginsida (kommer sen)</div>} />
-        <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/mypage" element={<MyPage />} />
+        <Route path="/PokerPage" element={<PokerPage />} />
       </Routes>
     </Router>
   );

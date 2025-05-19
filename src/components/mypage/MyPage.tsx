@@ -1,18 +1,31 @@
-import React, { useState } from "react";
-import Styles from "./Dashboard.module.css";
+import React, { useState, useEffect } from "react";
+import Styles from "./MyPage.module.css";
 import { TaskList, NewTaskPopup, StatisticsPanel } from ".";
+import { getTasks } from "../../api/api";
+import type { Task } from "../../api/api";
 
-const Dashboard: React.FC = () => {
+const MyPage: React.FC = () => {
   const [showPopup, setShowPopup] = useState(false);
+  const [tasks, setTasks] = useState<Task[]>([]);
 
-  const mockTasks = [
-    { id: "1", name: "Uppgift 1" },
-    { id: "2", name: "Uppgift 2" },
-    { id: "3", name: "Uppgift 3" },
-  ];
+  //laddar in och fräshar upp tasklist. 
+  const refreshTasks = async () => {
+    try {
+      const response = await getTasks();
+      const data = Array.isArray(response.data) ? response.data : [];
+      setTasks(data);
+    } catch (error) {
+      console.error("Kunde inte hämta tasks:", error);
+      setTasks([]);
+    }
+  };
+
+  useEffect(() => {
+    refreshTasks(); 
+  }, []);
 
   return (
-    <div className={Styles.dashboardContainer}>
+    <div className={Styles.myPageContainer}>
       <div className={Styles.main}>
         <div className={Styles.taskSection}>
           <h2>Uppgifter i projektet</h2>
@@ -24,10 +37,14 @@ const Dashboard: React.FC = () => {
             Skapa ny uppgift
           </button>
 
-          {/* Visar popupen bara då showPopup = true */}
-          {showPopup && <NewTaskPopup onClose={() => setShowPopup(false)} />}
+          {showPopup && (
+            <NewTaskPopup
+              onClose={() => setShowPopup(false)}
+              onTaskCreated={refreshTasks}
+            />
+          )}
 
-          <TaskList tasks={mockTasks} />
+          <TaskList tasks={tasks} />
         </div>
 
         <div className={Styles.statisticsSection}>
@@ -38,4 +55,4 @@ const Dashboard: React.FC = () => {
   );
 };
 
-export default Dashboard;
+export default MyPage;
