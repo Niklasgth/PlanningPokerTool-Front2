@@ -30,7 +30,11 @@ export const createTask = (task: Task) => api.post<Task>("/api/task", task);
 
 export const getUsers = () => api.get<User[]>("/api/users");
 export const getUserById = (id: string) => api.get<User>(`/api/user/${id}`);
-export const createUser = (user: User) => api.post<User>("/api//user", user);
+// export const createUser = (user: User) => api.post<User>("/api/user", user);
+
+// i do not need to create a new id cuase backend do it already so I skipping creating new id . so Omit skipping creating Id
+export const createUser = (user: Omit<User, 'id'>) =>api.post<User>("/api/user", user);
+  
 
 export const getTaskEstimates = () => api.get<TaskEstimate[]>("/api/taskEstimates");
 export const getTaskEstimateById = (id: string) => api.get<TaskEstimate>(`/api/taskEstimate/${id}`);
