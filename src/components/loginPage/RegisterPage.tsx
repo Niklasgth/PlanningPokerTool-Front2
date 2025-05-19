@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styles from './LoginPage.module.css';
 import {createUser, getUsers} from '../../../src/api/api';
 import type { User } from '../../../src/api/api';
+import { useNavigate } from 'react-router-dom';
 
 const RegisterPage: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -10,6 +11,8 @@ const RegisterPage: React.FC = () => {
   const [error, setError] = useState('');
   const [users, setUsers] = useState<User[]>([]);
   const [success, setSuccess] = useState('');
+  const navigate = useNavigate();
+
 
   useEffect(() => {
     // Fetch all users once when the component loads
@@ -51,6 +54,8 @@ const RegisterPage: React.FC = () => {
         setPassword('');
         setConfirmPassword('');
         setSuccess('Registreringen lyckades!');
+        // To auto navigate to loginPage after 2 sec.
+        setTimeout(() => navigate('/'), 2000);
     } 
     catch (err) {
         setError('Något gick fel vid registreringen');
