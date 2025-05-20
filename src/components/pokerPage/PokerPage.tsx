@@ -1,13 +1,20 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import styles from "./PokerPage.module.css";
 import { calculatePokerStats } from "../../utils/statUtil";
+import { getTaskById } from "../../api/api";
+import type { Task } from "../../api/api";
 
 // === Deltagare (kan bytas mot dynamisk användarlista) ===
 const participants = ["Anna", "Erik", "Lisa"];
 
 const PokerPage: React.FC = () => {
   const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
+
+  // === Task-data (namn, story etc) ===
+  const [task, setTask] = useState<Task | null>(null);
+  const [loading, setLoading] = useState(true);
 
   // === Sparar varje deltagares angivna tid, tomt fält eller "pass" ===
   const [times, setTimes] = useState<{ [name: string]: number | "pass" }>({});
@@ -17,6 +24,24 @@ const PokerPage: React.FC = () => {
 
   // === Visar felmeddelanden för ogiltig input per användare ===
   const [errors, setErrors] = useState<{ [name: string]: string }>({});
+
+  // === Hämta task från backend med task-id från URL ===
+  useEffect(() => {
+    const fetchTask = async () => {
+      try {
+        if (id) {
+          const response = await getTaskById(id);
+          setTask(response.data);
+        }
+      } catch (error) {
+        console.error("Kunde inte hämta task:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTask();
+  }, [id]);
 
   // === Uppdaterar tiden som skrivs in i inputfältet ===
   //tar emot deltagarnamn (senare mot user) samt dess input
@@ -35,19 +60,21 @@ const PokerPage: React.FC = () => {
       }));
       return;
     }
+
     //sparar ner det giltliga värdet
     setTimes((prev) => ({
       ...prev,
       [name]: num,
     }));
-//tar bort eventuella tidigare felmedelanden
+
+    //tar bort eventuella tidigare felmedelanden
     setErrors((prev) => ({
       ...prev,
       [name]: "",
     }));
   };
 
-  // === När användaren klickar "Rösta" (låser sin uppskattning) ===
+  // === När användaren klickar "Rösta" (låser sin uppskattning) todo ta in inputfält för skapa en taskestimate ===
   const handleLockVote = (name: string) => {
     const value = times[name];
     if (value === undefined) {
@@ -100,7 +127,7 @@ const PokerPage: React.FC = () => {
   const values = Object.values(times).filter((v): v is number => typeof v === "number");
 
   // === Beräknar statistikmått utifrån rösterna ===
-  const { average, median, mode, max, min, stdDev } = calculatePokerStats(values);
+  const { average, median, stdDev } = calculatePokerStats(values);
 
   // === Kollar om alla deltagare har låst sina svar ===
   const allVoted = participants.every((name) => locked[name]);
@@ -108,7 +135,10 @@ const PokerPage: React.FC = () => {
   // === Render ===
   return (
     <div className={styles.container}>
-      <h2 className={styles.title}>Timepooker – Tidsuppskattning</h2>
+      <h2 className={styles.title}>
+        {/* todo skriva ut taskname för task */}
+        {loading ? "Laddar..." : `Timepooker – ${task?.taskName || "Okänd uppgift"}`}
+      </h2>
       <p className={styles.description}>
         Sätt din uppskattning i timmar. Klicka "Rösta" för att låsa in, eller "Pass" om du inte kan ta ställning.
       </p>
@@ -156,9 +186,6 @@ const PokerPage: React.FC = () => {
         <div className={styles.resultSection}>
           <p><strong>Medelvärde:</strong> {average} timmar</p>
           <p><strong>Median:</strong> {median} timmar</p>
-          <p><strong>Typvärde:</strong> {mode} timmar</p>
-          <p><strong>Högsta tid:</strong> {max} timmar</p>
-          <p><strong>Lägsta tid:</strong> {min} timmar</p>
           <p><strong>Standardavvikelse:</strong> {typeof stdDev === "number" ? stdDev.toFixed(2) : stdDev} timmar</p>
         </div>
       ) : (
