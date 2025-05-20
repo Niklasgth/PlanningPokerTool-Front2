@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import Styles from "./StatisticsPanel.module.css";
-
+import LogOutButton from "../../logoutbutton/LogOutButton";
 const StatisticsPanel: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"statistik" | "vis">("vis");
 
   return (
     <div className={Styles.panel}>
       <div className={Styles.tabHeader}>
+        <LogOutButton />
+
         <button
           className={activeTab === "statistik" ? Styles.active : ""}
           onClick={() => setActiveTab("statistik")}
