@@ -1,3 +1,6 @@
+/* Föråldrad kod från utvecklingsmomentet när vi fortfarande hade uträkningarna i backend. */
+
+
 /**
  * === Medelvärde (average) ===
  * Räknar ut summan av alla värden och dividerar med antalet.
