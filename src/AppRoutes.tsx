@@ -13,12 +13,12 @@ const AppRoutes: React.FC = () => {
         <Route path="/" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/mypage" element={
-          <ProtectedRoute>
-            <MyPage />
-          </ProtectedRoute>
+
+          <MyPage />
+
         } />
         <Route path="/PokerPage" element={
-          <ProtectedRoute> 
+          <ProtectedRoute>
             <PokerPage />
           </ProtectedRoute>
         } />
