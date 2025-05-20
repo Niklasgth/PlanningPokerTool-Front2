@@ -3,7 +3,7 @@ import axios from "axios";
 
 export const api = axios.create({
 
-  baseURL: import.meta.env.VITE_API_URL || "https://seahorse-app-xeebi.ondigitalocean.app",
+  baseURL: "http://localhost:8080",
 });
 
 
@@ -34,6 +34,15 @@ export interface TaskEstimate {
   estimatedDuration: number;
 }
 
+export interface TaskStatsDTO {
+  taskId: string;
+  totalEstimates: number;
+  averageEstimate: number;
+  median: number;
+  stdDeviation: number;
+}
+
+
 // === Task-anrop ===
 export const getTasks = () => api.get<Task[]>("/api/tasks");
 export const getTaskById = (id: string) => api.get<Task>(`/api/task/${id}`);
@@ -53,3 +62,6 @@ export const getTaskEstimateById = (id: string) =>
   api.get<TaskEstimate>(`/api/taskEstimate/${id}`);
 export const createTaskEstimate = (taskEstimate: TaskEstimate) =>
   api.post<TaskEstimate>("/api/taskEstimate", taskEstimate);
+
+// === Statistik-anrop ===
+export const getStatsByTaskId = (id: string) => api.get<TaskStatsDTO>(`/api/stats/${id}`);

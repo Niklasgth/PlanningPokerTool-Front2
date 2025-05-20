@@ -9,18 +9,18 @@ interface TaskListProps {
 
 const TaskList: React.FC<TaskListProps> = ({ tasks }) => {
   if (tasks.length === 0) {
-        return <div>No tasks found</div>
-    }
+    return <div>No tasks found</div>
+  }
 
   return (
     <div className={Styles.taskList}>
       {Array.isArray(tasks) ? (
-      tasks.map(task => (
-        <TaskCard key={task.id} task={task} />
-      ))
-    ) : (
-      <p>Inga uppgifter att visa.</p>
-    )}
+        tasks.map(task => (
+          <TaskCard key={task.id} task={task} />
+        ))
+      ) : (
+        <p>Inga uppgifter att visa.</p>
+      )}
     </div>
   );
 };

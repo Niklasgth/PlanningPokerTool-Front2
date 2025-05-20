@@ -21,7 +21,7 @@ const MyPage: React.FC = () => {
   };
 
   useEffect(() => {
-    refreshTasks(); 
+    refreshTasks();
   }, []);
 
   return (
@@ -48,7 +48,7 @@ const MyPage: React.FC = () => {
         </div>
 
         <div className={Styles.statisticsSection}>
-          <StatisticsPanel />
+          <StatisticsPanel tasks={tasks} />
         </div>
       </div>
     </div>
