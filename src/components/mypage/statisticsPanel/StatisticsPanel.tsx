@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Styles from "./StatisticsPanel.module.css";
-
+import LogOutButton from "../../logoutbutton/LogOutButton";
 import { getStatsByTaskId, type Task, type TaskStatsDTO } from "../../../api/api";
 
 
