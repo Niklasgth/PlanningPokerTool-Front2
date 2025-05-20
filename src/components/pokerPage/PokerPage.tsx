@@ -5,10 +5,14 @@ import styles from "./PokerPage.module.css";
 import { calculatePokerStats } from "../../utils/statUtil";
 import { getTaskById, createTaskEstimate } from "../../api/api";
 import type { Task } from "../../api/api";
+import { getUsers } from "../../api/api";
+import type { User } from "../../api/api";
+
 
 const PokerPage: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
+  const [participants, setParticipants] = useState<User[]>([]);
 
   // === Task-data (namn, story etc) ===
   const [task, setTask] = useState<Task | null>(null);
@@ -49,6 +53,32 @@ const PokerPage: React.FC = () => {
 
     fetchTask();
   }, [id]);
+
+   useEffect(() => {
+    const fetchParticipants = async () => {
+      try {
+        const response = await getUsers();
+        let fetched = response.data;
+
+        // 🔧 ensure current user is included
+        const exists = fetched.some(p => p.userName === user?.userName);
+        if (!exists && user) {
+          fetched = [
+            ...fetched,
+            { id: user.id, userName: user.userName, userPassword: "" }
+          ];
+        }
+        setParticipants(fetched);
+      } catch (error) {
+        console.error("Kunde inte hämta användare:", error);
+      }
+    };
+    if (user) fetchParticipants();
+  }, [user]);
+const votedCount = participants.filter(p => locked[p.userName]).length;
+const notVotedCount = participants.length - votedCount;
+
+
 
   // === Kolla om användaren är inloggad, annars redirect ===
   useEffect(() => {
@@ -109,6 +139,7 @@ const PokerPage: React.FC = () => {
       return;
     }
     // If you already voted, you can't vote again.
+
     if (locked[name]) {
       setErrors((prev) => ({
         ...prev,
@@ -128,7 +159,6 @@ const PokerPage: React.FC = () => {
       ...prev,
       [name]: "",
     }));
-
   };
 
   // === När användaren klickar "Pass" (avstår att rösta) ===
@@ -173,10 +203,15 @@ const PokerPage: React.FC = () => {
       </h2>
       <p className={styles.description}>
         Inloggad som: <strong>{participantName}</strong>
+
         {locked[participantName] && times[participantName] !== "pass" && (
           <p style={{ color: "green" }}>✅ Din röst är sparad!</p>
         )}
+
       </p>
+        {locked[participantName] && times[participantName] !== "pass" && (
+          <h3 style={{ color: "green" }}>✅ Din röst är sparad!</h3>
+        )}
       {/* {task?.taskStory && (
         <p className={styles.story}><em>{task.taskStory}</em></p>
       )} */}
@@ -214,17 +249,24 @@ const PokerPage: React.FC = () => {
             </button>
 
           </div>
+
           {errors[participantName] && <div className={styles.error}>{errors[participantName]}</div>}
 
         </div>
       </div>
-
       {/* === Resultatruta – visas när användaren har röstat === */}
       {allVoted ? (
         <div className={styles.resultSection}>
           <p><strong>Medelvärde:</strong> {average} timmar</p>
           <p><strong>Median:</strong> {median} timmar</p>
           <p><strong>Standardavvikelse:</strong> {typeof stdDev === "number" ? stdDev.toFixed(2) : stdDev} timmar</p>
+          {participants.length > 0 && (
+          <div className={styles.voteStatus}>
+            <p><strong>Röstat:</strong> {votedCount} av {participants.length}</p>
+            <p><strong>Återstår:</strong> {notVotedCount}</p>
+          </div>
+        )}
+
         </div>
       ) : (
         <div className={styles.resultSection}>

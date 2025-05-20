@@ -47,6 +47,8 @@ export interface TaskStatsDTO {
 export const getTasks = () => api.get<Task[]>("/api/tasks");
 export const getTaskById = (id: string) => api.get<Task>(`/api/task/${id}`);
 export const createTask = (task: Task) => api.post<Task>("/api/task", task);
+export const updateTask = (id: string, updatedFields: Partial<Task>) =>
+  api.patch<Task>(`/api/task/${id}`, updatedFields);
 
 // === User-anrop ===
 export const getUsers = () => api.get<User[]>("/api/users");
