@@ -1,15 +1,21 @@
-import React, { useState,useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-// import styles from "../pokerPage/PokerPage.module.css";
+
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import styles from "./PokerPage.module.css";
 import { calculatePokerStats } from "../../utils/statUtil";
-
-// === Deltagare (kan bytas mot dynamisk användarlista) ===
-// const participants = ["Anna", "Erik", "Lisa"];
-
+import { getTaskById } from "../../api/api";
+import type { Task } from "../../api/api";
 
 const PokerPage: React.FC = () => {
   const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
+
+  // === Task-data (namn, story etc) ===
+  const [task, setTask] = useState<Task | null>(null);
+  const [loadingTask, setLoadingTask] = useState(true);
+
+  // === Hämtar inloggad användare från localStorage ===
+  const [user, setUser] = useState<{ id: string; userName: string } | null>(null);
 
   // === Sparar varje deltagares angivna tid, tomt fält eller "pass" ===
   const [times, setTimes] = useState<{ [name: string]: number | "pass" }>({});
@@ -20,30 +26,41 @@ const PokerPage: React.FC = () => {
   // === Visar felmeddelanden för ogiltig input per användare ===
   const [errors, setErrors] = useState<{ [name: string]: string }>({});
 
-  const [user, setUser] = useState<{ id: string; userName: string } | null>(null);
-
+  // === Hämta task från backend ===
   useEffect(() => {
-  const storedUser = localStorage.getItem("user");
+    const fetchTask = async () => {
+      try {
+        if (id) {
+          const response = await getTaskById(id);
+          setTask(response.data);
+        }
+      } catch (error) {
+        console.error("Kunde inte hämta task:", error);
+      } finally {
+        setLoadingTask(false);
+      }
+    };
 
-  if (storedUser) {
-    const parsed = JSON.parse(storedUser);
-    setUser(parsed);
-  } else {
-    navigate("/");
-  }
-}, [navigate]);
+    fetchTask();
+  }, [id]);
 
+  // === Kolla om användaren är inloggad, annars redirect ===
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+
+    if (storedUser) {
+      const parsed = JSON.parse(storedUser);
+      setUser(parsed);
+    } else {
+      navigate("/");
+    }
+  }, [navigate]);
 
   // === Uppdaterar tiden som skrivs in i inputfältet ===
-  //tar emot deltagarnamn (senare mot user) samt dess input
   const handleChange = (name: string, value: string) => {
-    //om deltagare låst svar sker inget
     if (locked[name]) return;
 
-    //omvandlar om möjligt string inmatningen till heltal (number)
     const num = parseInt(value);
-
-    //nan betyder not a number (boolean kontroll för ogiltlig input)
     if (isNaN(num)) {
       setErrors((prev) => ({
         ...prev,
@@ -51,21 +68,13 @@ const PokerPage: React.FC = () => {
       }));
       return;
     }
-    //sparar ner det giltliga värdet
-    setTimes((prev) => ({
-      ...prev,
-      [name]: num,
-    }));
-//tar bort eventuella tidigare felmedelanden
-    setErrors((prev) => ({
-      ...prev,
-      [name]: "",
-    }));
+
+    setTimes((prev) => ({ ...prev, [name]: num }));
+    setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
   // === När användaren klickar "Rösta" (låser sin uppskattning) ===
   const handleLockVote = (name: string) => {
-    
         const value = times[name];
         if (value === undefined) {
           setErrors((prev) => ({
@@ -90,24 +99,14 @@ const PokerPage: React.FC = () => {
           ...prev,
           [name]: "",
         }));
+
   };
 
   // === När användaren klickar "Pass" (avstår att rösta) ===
   const handlePass = (name: string) => {
-    setTimes((prev) => ({
-      ...prev,
-      [name]: "pass",
-    }));
-
-    setLocked((prev) => ({
-      ...prev,
-      [name]: true,
-    }));
-
-    setErrors((prev) => ({
-      ...prev,
-      [name]: "",
-    }));
+    setTimes((prev) => ({ ...prev, [name]: "pass" }));
+    setLocked((prev) => ({ ...prev, [name]: true }));
+    setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
   // === Startar om rundan – rensar allt ===
@@ -134,21 +133,19 @@ const PokerPage: React.FC = () => {
     navigate("/");
   };
 
-  // === Hämtar alla inskickade nummer-värden (filtrerar bort "pass") ===
-  const values = Object.values(times).filter((v): v is number => typeof v === "number");
-
-  // === Beräknar statistikmått utifrån rösterna ===
-  const { average, median, mode, max, min, stdDev } = calculatePokerStats(values);
-
   const participantName = user?.userName || "Okänd";
-
-  // === Kollar om alla deltagare har låst sina svar ===
   const allVoted = !!locked[participantName];
 
+  // === Statistikberäkning ===
+  const values = Object.values(times).filter((v): v is number => typeof v === "number");
+  const { average, median, stdDev } = calculatePokerStats(values);
+
   // === Render ===
-return (
+  return (
     <div className={styles.container}>
-      <h2 className={styles.title}>Timepooker – Tidsuppskattning</h2>
+      <h2 className={styles.title}>
+        {loadingTask ? "Laddar..." : `Timepooker – ${task?.taskName || "Okänd uppgift"}`}
+      </h2>
       <p className={styles.description}>
         Inloggad som: <strong>{participantName}</strong>
           {locked[participantName] && times[participantName] !== "pass" && (
@@ -156,7 +153,11 @@ return (
         )}
           {errors[participantName] && <div className={styles.error}>{errors[participantName]}</div>}
       </p>
+      {task?.taskStory && (
+        <p className={styles.story}><em>{task.taskStory}</em></p>
+      )}
 
+      {/* === Inputfält och knappar för användaren === */}
       <div className={styles.participantList}>
         <div className={styles.participantRow}>
           <div className={styles.inputGroup}>
@@ -192,13 +193,11 @@ return (
         </div>
       </div>
 
+      {/* === Resultatruta – visas när användaren har röstat === */}
       {allVoted ? (
         <div className={styles.resultSection}>
           <p><strong>Medelvärde:</strong> {average} timmar</p>
           <p><strong>Median:</strong> {median} timmar</p>
-          <p><strong>Typvärde:</strong> {mode} timmar</p>
-          <p><strong>Högsta tid:</strong> {max} timmar</p>
-          <p><strong>Lägsta tid:</strong> {min} timmar</p>
           <p><strong>Standardavvikelse:</strong> {typeof stdDev === "number" ? stdDev.toFixed(2) : stdDev} timmar</p>
         </div>
       ) : (
@@ -207,16 +206,11 @@ return (
         </div>
       )}
 
+      {/* === Kontrollknappar === */}
       <div className={styles.controlButtons}>
-        <button className={styles.resetButton} onClick={handleReset}>
-          Ny runda
-        </button>
-        <button className={styles.endButton} onClick={handleEndVoting}>
-          Avsluta omröstning
-        </button>
-        <button className={styles.logoutButton} onClick={handleLogout}>
-          Logga ut
-        </button>
+        <button className={styles.resetButton} onClick={handleReset}>Ny runda</button>
+        <button className={styles.endButton} onClick={handleEndVoting}>Avsluta omröstning</button>
+        <button className={styles.logoutButton} onClick={handleLogout}>Logga ut</button>
       </div>
     </div>
   );
