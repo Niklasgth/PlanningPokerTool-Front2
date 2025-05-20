@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import styles from "./PokerPage.module.css";
 import { calculatePokerStats } from "../../utils/statUtil";
-import { getTaskById } from "../../api/api";
+import { getTaskById, createTaskEstimate } from "../../api/api";
 import type { Task } from "../../api/api";
 import { getUsers } from "../../api/api";
 import type { User } from "../../api/api";
@@ -29,6 +29,12 @@ const PokerPage: React.FC = () => {
 
   // === Visar felmeddelanden för ogiltig input per användare ===
   const [errors, setErrors] = useState<{ [name: string]: string }>({});
+
+  //TODO
+  // user can actually vote -> connect with backend DONE
+  // handle pass button -> send som 0 to backend DONE
+  // lock pass button after user has voted
+  // user can only vote once
 
   // === Hämta task från backend ===
   useEffect(() => {
@@ -103,38 +109,61 @@ const notVotedCount = participants.length - votedCount;
     setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
-  // === När användaren klickar "Rösta" (låser sin uppskattning) ===
-  const handleLockVote = (name: string) => {
-        const value = times[name];
-        if (value === undefined) {
-          setErrors((prev) => ({
-            ...prev,
-            [name]: "Du måste ange ett värde eller välja Pass.",
-          }));
-          return;
-        }
-    // If you already voted, you can't vote again.
-        if (locked[name]){
-          setErrors((prev) => ({
-            ...prev,
-            [name]: "Du kan inte rösta igen.",
-          }))
-          return;
-        } 
-        setLocked((prev) => ({
-          ...prev,
-          [name]: true,
-        }));
-        setErrors((prev) => ({
-          ...prev,
-          [name]: "",
-        }));
-        
+  // === När användaren klickar "Rösta" (skickar in TaskEstimate) ===
+  const handleSubmit = async (estDurationHours: number | "pass") => {
+    if (!user || !task) return;
 
+    const estimatedValue = estDurationHours === "pass" ? 0 : estDurationHours;
+    try {
+      await createTaskEstimate({
+        taskId: task.id ?? "",
+        userId: user.id,
+        estDurationHours: estimatedValue,
+      });
+    } catch (error) {
+      setErrors((prev) => ({
+        ...prev,
+        [participantName]: "Kunde inte spara röst.",
+      }));
+    }
+  }
+
+  // === När användaren klickar "Rösta" (låser sin uppskattning) ===
+  const handleLockVote = async (name: string) => {
+    const value = times[name];
+    if (value === undefined) {
+      setErrors((prev) => ({
+        ...prev,
+        [name]: "Du måste ange ett värde eller välja Pass.",
+      }));
+      return;
+    }
+    // If you already voted, you can't vote again.
+
+    if (locked[name]) {
+      setErrors((prev) => ({
+        ...prev,
+        [name]: "Du kan inte rösta igen.",
+      }))
+      return;
+    }
+
+    // Call the API to save the vote
+    await handleSubmit(value);
+
+    setLocked((prev) => ({
+      ...prev,
+      [name]: true,
+    }));
+    setErrors((prev) => ({
+      ...prev,
+      [name]: "",
+    }));
   };
 
   // === När användaren klickar "Pass" (avstår att rösta) ===
-  const handlePass = (name: string) => {
+  const handlePass = async (name: string) => {
+    await handleSubmit("pass");
     setTimes((prev) => ({ ...prev, [name]: "pass" }));
     setLocked((prev) => ({ ...prev, [name]: true }));
     setErrors((prev) => ({ ...prev, [name]: "" }));
@@ -149,13 +178,13 @@ const notVotedCount = participants.length - votedCount;
 
   // === Navigerar till /mypage (kan senare användas för att spara data) ===
   const handleEndVoting = () => {
-      if (!locked[participantName]) {
-    setErrors((prev) => ({
-      ...prev,
-      [participantName]: "Du måste rösta eller välja pass innan du kan avsluta.",
-    }));
-    return;
-  }
+    if (!locked[participantName]) {
+      setErrors((prev) => ({
+        ...prev,
+        [participantName]: "Du måste rösta eller välja pass innan du kan avsluta.",
+      }));
+      return;
+    }
     navigate("/mypage");
   };
 
@@ -174,6 +203,11 @@ const notVotedCount = participants.length - votedCount;
       </h2>
       <p className={styles.description}>
         Inloggad som: <strong>{participantName}</strong>
+
+        {locked[participantName] && times[participantName] !== "pass" && (
+          <p style={{ color: "green" }}>✅ Din röst är sparad!</p>
+        )}
+
       </p>
         {locked[participantName] && times[participantName] !== "pass" && (
           <h3 style={{ color: "green" }}>✅ Din röst är sparad!</h3>
@@ -207,15 +241,17 @@ const notVotedCount = participants.length - votedCount;
               {locked[participantName] && times[participantName] !== "pass" ? "🔒 Låst" : "Rösta"}
             </button>
             <button
-              className={styles.passButton}
+              className={styles.voteButton}
               onClick={() => handlePass(participantName)}
-              disabled={locked[participantName]}
+              disabled={locked[participantName] || times[participantName] !== undefined}
             >
-              {locked[participantName] && times[participantName] === "pass" ? "🔒 Pass" : "Pass"}
+              {locked[participantName] || times[participantName] === "pass" ? "🔒 Låst" : "Pass"}
             </button>
 
           </div>
-            {errors[participantName] && <div className={styles.error}>{errors[participantName]}</div>}
+
+          {errors[participantName] && <div className={styles.error}>{errors[participantName]}</div>}
+
         </div>
       </div>
       {/* === Resultatruta – visas när användaren har röstat === */}

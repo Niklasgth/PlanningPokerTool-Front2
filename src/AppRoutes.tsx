@@ -15,14 +15,14 @@ const AppRoutes: React.FC = () => {
         <Route path="/mypage" element={
 <ProtectedRoute>
           <MyPage />
-  </ProtectedRoute>
+</ProtectedRoute>
         } />
 
         <Route path="/pokerpage/:id" element={
-  <ProtectedRoute>
-    <PokerPage />
-  </ProtectedRoute>
-} />
+<ProtectedRoute>
+          <PokerPage />
+</ProtectedRoute>
+        } />
       </Routes>
     </Router>
   );

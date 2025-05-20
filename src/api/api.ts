@@ -31,7 +31,7 @@ export interface TaskEstimate {
   id: string;
   taskId: string;
   userId: string;
-  estimatedDuration: number;
+  estDurationHours: number;
 }
 
 export interface TaskStatsDTO {
@@ -62,7 +62,7 @@ export const loginUser = (data: LoginRequest) =>
 export const getTaskEstimates = () => api.get<TaskEstimate[]>("/api/taskEstimates");
 export const getTaskEstimateById = (id: string) =>
   api.get<TaskEstimate>(`/api/taskEstimate/${id}`);
-export const createTaskEstimate = (taskEstimate: TaskEstimate) =>
+export const createTaskEstimate = (taskEstimate: Omit<TaskEstimate, 'id'>) =>
   api.post<TaskEstimate>("/api/taskEstimate", taskEstimate);
 
 // === Statistik-anrop ===
