@@ -22,6 +22,9 @@ const LoginPage: React.FC = () => {
         userName: username,
         userPassword: password,
       });
+      //React doesn’t remember this automatically when you change routes. 
+      // By saving it to localStorage, you make that data available everywhere in the app.
+      localStorage.setItem("user", JSON.stringify(response.data));
 
       console.log('Login success:', response.data);
       // Navigera vidare till användarens dashboard (mypage)

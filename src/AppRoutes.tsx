@@ -17,7 +17,7 @@ const AppRoutes: React.FC = () => {
             <MyPage />
           </ProtectedRoute>
         } />
-        <Route path="/PokerPage" element={
+        <Route path="/pokerpage" element={
           <ProtectedRoute> 
             <PokerPage />
           </ProtectedRoute>
