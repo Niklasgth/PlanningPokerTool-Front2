@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import styles from "./PokerPage.module.css";
@@ -74,18 +75,31 @@ const PokerPage: React.FC = () => {
 
   // === När användaren klickar "Rösta" (låser sin uppskattning) ===
   const handleLockVote = (name: string) => {
-    const value = times[name];
-    if (value === undefined) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: "Du måste ange ett värde eller välja Pass.",
-      }));
-      return;
-    }
+        const value = times[name];
+        if (value === undefined) {
+          setErrors((prev) => ({
+            ...prev,
+            [name]: "Du måste ange ett värde eller välja Pass.",
+          }));
+          return;
+        }
+    // If you already voted, you can't vote again.
+        if (locked[name]){
+          setErrors((prev) => ({
+            ...prev,
+            [name]: "Du kan inte rösta igen.",
+          }))
+          return;
+        } 
+        setLocked((prev) => ({
+          ...prev,
+          [name]: true,
+        }));
+        setErrors((prev) => ({
+          ...prev,
+          [name]: "",
+        }));
 
-    if (value !== "pass") {
-      setLocked((prev) => ({ ...prev, [name]: true }));
-    }
   };
 
   // === När användaren klickar "Pass" (avstår att rösta) ===
@@ -104,6 +118,13 @@ const PokerPage: React.FC = () => {
 
   // === Navigerar till /mypage (kan senare användas för att spara data) ===
   const handleEndVoting = () => {
+      if (!locked[participantName]) {
+    setErrors((prev) => ({
+      ...prev,
+      [participantName]: "Du måste rösta eller välja pass innan du kan avsluta.",
+    }));
+    return;
+  }
     navigate("/mypage");
   };
 
@@ -127,6 +148,10 @@ const PokerPage: React.FC = () => {
       </h2>
       <p className={styles.description}>
         Inloggad som: <strong>{participantName}</strong>
+          {locked[participantName] && times[participantName] !== "pass" && (
+          <p style={{ color: "green" }}>✅ Din röst är sparad!</p>
+        )}
+          {errors[participantName] && <div className={styles.error}>{errors[participantName]}</div>}
       </p>
       {task?.taskStory && (
         <p className={styles.story}><em>{task.taskStory}</em></p>
@@ -163,8 +188,8 @@ const PokerPage: React.FC = () => {
             >
               {locked[participantName] && times[participantName] === "pass" ? "🔒 Pass" : "Pass"}
             </button>
+
           </div>
-          {errors[participantName] && <div className={styles.error}>{errors[participantName]}</div>}
         </div>
       </div>
 
