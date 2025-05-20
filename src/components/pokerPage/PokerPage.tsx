@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./PokerPage.module.css";
 import { calculatePokerStats } from "../../utils/statUtil";
 
 // === Deltagare (kan bytas mot dynamisk användarlista) ===
-const participants = ["Anna", "Erik", "Lisa"];
+// const participants = ["Anna", "Erik", "Lisa"];
+
 
 const PokerPage: React.FC = () => {
   const navigate = useNavigate();
@@ -17,6 +18,20 @@ const PokerPage: React.FC = () => {
 
   // === Visar felmeddelanden för ogiltig input per användare ===
   const [errors, setErrors] = useState<{ [name: string]: string }>({});
+
+  const [user, setUser] = useState<{ id: string; userName: string } | null>(null);
+
+  useEffect(() => {
+  const storedUser = localStorage.getItem("user");
+
+  if (storedUser) {
+    const parsed = JSON.parse(storedUser);
+    setUser(parsed);
+  } else {
+    navigate("/");
+  }
+}, [navigate]);
+
 
   // === Uppdaterar tiden som skrivs in i inputfältet ===
   //tar emot deltagarnamn (senare mot user) samt dess input
@@ -96,62 +111,65 @@ const PokerPage: React.FC = () => {
     navigate("/mypage");
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    navigate("/");
+  };
+
   // === Hämtar alla inskickade nummer-värden (filtrerar bort "pass") ===
   const values = Object.values(times).filter((v): v is number => typeof v === "number");
 
   // === Beräknar statistikmått utifrån rösterna ===
   const { average, median, mode, max, min, stdDev } = calculatePokerStats(values);
 
+  const participantName = user?.userName || "Okänd";
+
   // === Kollar om alla deltagare har låst sina svar ===
-  const allVoted = participants.every((name) => locked[name]);
+  const allVoted = !!locked[participantName];
 
   // === Render ===
-  return (
+return (
     <div className={styles.container}>
       <h2 className={styles.title}>Timepooker – Tidsuppskattning</h2>
       <p className={styles.description}>
-        Sätt din uppskattning i timmar. Klicka "Rösta" för att låsa in, eller "Pass" om du inte kan ta ställning.
+        Inloggad som: <strong>{participantName}</strong>
       </p>
 
-      {/* === Inputfält och knappar för varje deltagare === */}
       <div className={styles.participantList}>
-        {participants.map((name) => (
-          <div key={name} className={styles.participantRow}>
-            <div className={styles.inputGroup}>
-              <span className={styles.participantName}>{name}</span>
-              <input
-                type="number"
-                className={styles.input}
-                placeholder="timmar"
-                value={typeof times[name] === "number" ? times[name] : ""}
-                min={0}
-                max={40}
-                onChange={(e) => handleChange(name, e.target.value)}
-                disabled={locked[name]}
-              />
-            </div>
-            <div className={styles.buttonGroup}>
-              <button
-                className={styles.voteButton}
-                onClick={() => handleLockVote(name)}
-                disabled={locked[name] || times[name] === "pass" || times[name] === undefined}
-              >
-                {locked[name] && times[name] !== "pass" ? "🔒 Låst" : "Rösta"}
-              </button>
-              <button
-                className={styles.passButton}
-                onClick={() => handlePass(name)}
-                disabled={locked[name]}
-              >
-                {locked[name] && times[name] === "pass" ? "🔒 Pass" : "Pass"}
-              </button>
-            </div>
-            {errors[name] && <div className={styles.error}>{errors[name]}</div>}
+        <div className={styles.participantRow}>
+          <div className={styles.inputGroup}>
+            <span className={styles.participantName}>{participantName}</span>
+            <input
+              type="number"
+              className={styles.input}
+              placeholder="timmar"
+              value={typeof times[participantName] === "number" ? times[participantName] : ""}
+              min={0}
+              max={40}
+              onChange={(e) => handleChange(participantName, e.target.value)}
+              disabled={locked[participantName]}
+            />
           </div>
-        ))}
+          <div className={styles.buttonGroup}>
+            <button
+              className={styles.voteButton}
+              onClick={() => handleLockVote(participantName)}
+              disabled={locked[participantName] || times[participantName] === "pass" || times[participantName] === undefined}
+            >
+              {locked[participantName] && times[participantName] !== "pass" ? "🔒 Låst" : "Rösta"}
+            </button>
+            <button
+              className={styles.passButton}
+              onClick={() => handlePass(participantName)}
+              disabled={locked[participantName]}
+            >
+              {locked[participantName] && times[participantName] === "pass" ? "🔒 Pass" : "Pass"}
+            </button>
+          </div>
+          {errors[participantName] && <div className={styles.error}>{errors[participantName]}</div>}
+        </div>
       </div>
 
-      {/* === Resultatruta – visas när alla röstat === */}
       {allVoted ? (
         <div className={styles.resultSection}>
           <p><strong>Medelvärde:</strong> {average} timmar</p>
@@ -163,17 +181,19 @@ const PokerPage: React.FC = () => {
         </div>
       ) : (
         <div className={styles.resultSection}>
-          <p><em>Väntar på att alla ska rösta eller välja pass...</em></p>
+          <p><em>Väntar på att du röstar eller väljer pass...</em></p>
         </div>
       )}
 
-      {/* === Kontrollknappar === */}
       <div className={styles.controlButtons}>
         <button className={styles.resetButton} onClick={handleReset}>
           Ny runda
         </button>
         <button className={styles.endButton} onClick={handleEndVoting}>
           Avsluta omröstning
+        </button>
+        <button className={styles.logoutButton} onClick={handleLogout}>
+          Logga ut
         </button>
       </div>
     </div>
