@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import Styles from "./StatisticsPanel.module.css";
+
 import { getStatsByTaskId, type Task, type TaskStatsDTO } from "../../../api/api";
 
 
@@ -29,6 +30,8 @@ const StatisticsPanel: React.FC<TaskStatsProps> = ({ tasks }) => {
   return (
     <div className={Styles.panel}>
       <div className={Styles.tabHeader}>
+        <LogOutButton />
+
         <button
           className={activeTab === "statistik" ? Styles.active : ""}
           onClick={() => setActiveTab("statistik")}
