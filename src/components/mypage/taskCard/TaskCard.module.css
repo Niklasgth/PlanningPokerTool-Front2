@@ -21,3 +21,18 @@
 }
 
 
+.input {
+  margin-right: 0.5rem;
+  padding: 0.3rem;
+  width: 4rem;
+}
+
+.loggedTime {
+  font-weight: bold;
+  color: green;
+}
+
+.error {
+  color: red;
+  margin-top: 0.3rem;
+}
