@@ -1,5 +1,6 @@
 import React, { useState,useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+// import styles from "../pokerPage/PokerPage.module.css";
 import styles from "./PokerPage.module.css";
 import { calculatePokerStats } from "../../utils/statUtil";
 
@@ -64,21 +65,31 @@ const PokerPage: React.FC = () => {
 
   // === När användaren klickar "Rösta" (låser sin uppskattning) ===
   const handleLockVote = (name: string) => {
-    const value = times[name];
-    if (value === undefined) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: "Du måste ange ett värde eller välja Pass.",
-      }));
-      return;
-    }
-
-    if (value !== "pass") {
-      setLocked((prev) => ({
-        ...prev,
-        [name]: true,
-      }));
-    }
+    
+        const value = times[name];
+        if (value === undefined) {
+          setErrors((prev) => ({
+            ...prev,
+            [name]: "Du måste ange ett värde eller välja Pass.",
+          }));
+          return;
+        }
+    // If you already voted, you can't vote again.
+        if (locked[name]){
+          setErrors((prev) => ({
+            ...prev,
+            [name]: "Du kan inte rösta igen.",
+          }))
+          return;
+        } 
+        setLocked((prev) => ({
+          ...prev,
+          [name]: true,
+        }));
+        setErrors((prev) => ({
+          ...prev,
+          [name]: "",
+        }));
   };
 
   // === När användaren klickar "Pass" (avstår att rösta) ===
@@ -108,6 +119,13 @@ const PokerPage: React.FC = () => {
 
   // === Navigerar till /mypage (kan senare användas för att spara data) ===
   const handleEndVoting = () => {
+      if (!locked[participantName]) {
+    setErrors((prev) => ({
+      ...prev,
+      [participantName]: "Du måste rösta eller välja pass innan du kan avsluta.",
+    }));
+    return;
+  }
     navigate("/mypage");
   };
 
@@ -133,6 +151,10 @@ return (
       <h2 className={styles.title}>Timepooker – Tidsuppskattning</h2>
       <p className={styles.description}>
         Inloggad som: <strong>{participantName}</strong>
+          {locked[participantName] && times[participantName] !== "pass" && (
+          <p style={{ color: "green" }}>✅ Din röst är sparad!</p>
+        )}
+          {errors[participantName] && <div className={styles.error}>{errors[participantName]}</div>}
       </p>
 
       <div className={styles.participantList}>
@@ -165,8 +187,8 @@ return (
             >
               {locked[participantName] && times[participantName] === "pass" ? "🔒 Pass" : "Pass"}
             </button>
+
           </div>
-          {errors[participantName] && <div className={styles.error}>{errors[participantName]}</div>}
         </div>
       </div>
 
