@@ -128,11 +128,6 @@ const PokerPage: React.FC = () => {
     navigate("/mypage");
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-    navigate("/");
-  };
-
   const participantName = user?.userName || "Okänd";
   const allVoted = !!locked[participantName];
 
@@ -151,11 +146,10 @@ const PokerPage: React.FC = () => {
           {locked[participantName] && times[participantName] !== "pass" && (
           <p style={{ color: "green" }}>✅ Din röst är sparad!</p>
         )}
-          {errors[participantName] && <div className={styles.error}>{errors[participantName]}</div>}
       </p>
-      {task?.taskStory && (
+      {/* {task?.taskStory && (
         <p className={styles.story}><em>{task.taskStory}</em></p>
-      )}
+      )} */}
 
       {/* === Inputfält och knappar för användaren === */}
       <div className={styles.participantList}>
@@ -190,6 +184,8 @@ const PokerPage: React.FC = () => {
             </button>
 
           </div>
+            {errors[participantName] && <div className={styles.error}>{errors[participantName]}</div>}
+
         </div>
       </div>
 
@@ -210,7 +206,6 @@ const PokerPage: React.FC = () => {
       <div className={styles.controlButtons}>
         <button className={styles.resetButton} onClick={handleReset}>Ny runda</button>
         <button className={styles.endButton} onClick={handleEndVoting}>Avsluta omröstning</button>
-        <button className={styles.logoutButton} onClick={handleLogout}>Logga ut</button>
       </div>
     </div>
   );
