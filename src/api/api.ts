@@ -1,8 +1,11 @@
 import axios from "axios";
 
+
 export const api = axios.create({
+
   baseURL: import.meta.env.VITE_API_URL || "https://seahorse-app-xeebi.ondigitalocean.app",
 });
+
 
 // === Typer ===
 export interface Task {
