@@ -116,16 +116,12 @@ const PokerPage: React.FC = () => {
     setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
-  // === När användaren klickar "Rösta" (låser sin uppskattning) ===
-  const handleLockVote = async (name: string) => {
+  // === Allmän för både "Rösta" och "Pass" ===
+  const handleVote = async (name: string, value: number | "pass") => {
     if (name !== participantName || !user || !task || !task.id) return;
-    const value = times[name];
-    if (value === undefined || typeof value !== "number") {
-      setErrors((prev) => ({ ...prev, [name]: "Du måste ange ett värde eller välja Pass." }));
-      return;
-    }
     try {
-      await createTaskEstimate({ taskId: task.id, userId: user.id, estDurationHours: value });
+      await createTaskEstimate({ taskId: task.id, userId: user.id, estDurationHours: value === "pass" ? 0 : value });
+      setTimes((prev) => ({ ...prev, [name]: value }));
       setLocked((prev) => ({ ...prev, [name]: true }));
       setErrors((prev) => ({ ...prev, [name]: "" }));
     } catch (err) {
@@ -133,18 +129,36 @@ const PokerPage: React.FC = () => {
     }
   };
 
+  // === När användaren klickar "Rösta" (låser sin uppskattning) ===
+  // const handleLockVote = async (name: string) => {
+  //   if (name !== participantName || !user || !task || !task.id) return;
+  //   const value = times[name];
+  //   if (value === undefined || typeof value !== "number") {
+  //     setErrors((prev) => ({ ...prev, [name]: "Du måste ange ett värde eller välja Pass." }));
+  //     return;
+  //   }
+  //   try {
+  //     await createTaskEstimate({ taskId: task.id, userId: user.id, estDurationHours: value });
+  //     setLocked((prev) => ({ ...prev, [name]: true }));
+  //     setErrors((prev) => ({ ...prev, [name]: "" }));
+  //   } catch (err) {
+  //     setErrors((prev) => ({ ...prev, [name]: "Kunde inte spara röst." }));
+  //   }
+  // };
+
   // === När användaren klickar "Pass" (avstår att rösta) ===
-  const handlePass = async (name: string) => {
-    if (name !== participantName || !user || !task || !task.id) return;
-    try {
-      await createTaskEstimate({ taskId: task.id, userId: user.id, estDurationHours: 1 });
-      setTimes((prev) => ({ ...prev, [name]: "pass" }));
-      setLocked((prev) => ({ ...prev, [name]: true }));
-      setErrors((prev) => ({ ...prev, [name]: "" }));
-    } catch (err) {
-      setErrors((prev) => ({ ...prev, [name]: "Kunde inte spara pass." }));
-    }
-  };
+  // const handlePass = async (name: string) => {
+  //   if (name !== participantName || !user || !task || !task.id) return;
+  //   try {
+  //     await createTaskEstimate({ taskId: task.id, userId: user.id, estDurationHours: 0 });
+  //     setTimes((prev) => ({ ...prev, [name]: "pass" }));
+  //     setLocked((prev) => ({ ...prev, [name]: true }));
+  //     setErrors((prev) => ({ ...prev, [name]: "" }));
+  //   } catch (err) {
+  //     setErrors((prev) => ({ ...prev, [name]: "Kunde inte spara pass." }));
+  //   }
+  // };
+
 
   const handleLeave = () =>
     navigate("/mypage");
@@ -191,17 +205,17 @@ const PokerPage: React.FC = () => {
             <div className={styles.buttonGroup}>
               <button
                 className={styles.voteButton}
-                onClick={() => handleLockVote(name)}
+                onClick={() => handleVote(name, times[name])}
                 disabled={locked[name] || times[name] === "pass" || times[name] === undefined || name !== participantName}
               >
-                {locked[name] && times[name] !== "pass" ? "🔒 Låst" : "Rösta"}
+                {locked[name] || times[name] == "pass" ? "🔒 Låst" : "Rösta"}
               </button>
               <button
-                className={styles.passButton}
-                onClick={() => handlePass(name)}
+                className={styles.voteButton}
+                onClick={() => handleVote(name, "pass")}
                 disabled={locked[name] || name !== participantName}
               >
-                {locked[name] && times[name] === "pass" ? "🔒 Pass" : "Pass"}
+                {locked[name] || times[name] === "pass" ? "🔒 Pass" : "Pass"}
               </button>
             </div>
             {errors[name] && <div className={styles.error}>{errors[name]}</div>}
