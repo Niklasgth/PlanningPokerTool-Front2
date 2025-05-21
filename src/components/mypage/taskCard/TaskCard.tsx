@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Styles from "./TaskCard.module.css";
-import type  { Task } from "../../../api/api";
-import { updateTask } from "../../../api/api";
+import type  { TaskEstimate,Task } from "../../../api/api";
+import { updateTask,getTaskEstimates } from "../../../api/api";
 
 interface TaskCardProps {
   task: Task;
@@ -10,11 +10,27 @@ interface TaskCardProps {
 
 const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
   const navigate = useNavigate();
+  const [hasVoted, setHasVoted] = useState(false);
+  const currentUserId = localStorage.getItem("user")
+  ? JSON.parse(localStorage.getItem("user")!).id
+  : null;
 
   const [durationLogged, setDurationLogged] = useState<boolean>(!!task.taskDuration);
   const [duration, setDuration] = useState<number | undefined>(task.taskDuration);
   const [inputValue, setInputValue] = useState<string>(""); // temporärt inputfält
   const [error, setError] = useState<string>("");
+
+    useEffect(() => {
+    if (!task.id || !currentUserId) return;
+    getTaskEstimates()
+      .then(res => {
+        const estimates: TaskEstimate[] = res.data;
+        setHasVoted(
+          estimates.some(e => e.taskId === task.id && e.userId === currentUserId)
+        );
+      })
+      .catch(console.error);
+  }, [task.id, currentUserId]);
 
   // === Navigera till pokerpage med rätt task-id ===
   const handlePokerClick = () => {
@@ -46,7 +62,13 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
     <div className={Styles.card}>
       <span>{task.taskName}</span>
       <div className={Styles.actions}>
-        <button onClick={handlePokerClick}>Poker</button>
+        {/* <button onClick={handlePokerClick}>Poker</button> */}
+        <button
+          onClick={handlePokerClick}
+          disabled={hasVoted}
+          >
+          {hasVoted ? "🔒 Låst" : "Poker"}
+        </button>
 
         {durationLogged ? (
           <span className={Styles.loggedTime}>⏱ {duration} h loggat</span>

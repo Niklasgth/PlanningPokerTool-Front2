@@ -137,7 +137,7 @@ const PokerPage: React.FC = () => {
   const handlePass = async (name: string) => {
     if (name !== participantName || !user || !task || !task.id) return;
     try {
-      await createTaskEstimate({ taskId: task.id, userId: user.id, estDurationHours: 0 });
+      await createTaskEstimate({ taskId: task.id, userId: user.id, estDurationHours: 1 });
       setTimes((prev) => ({ ...prev, [name]: "pass" }));
       setLocked((prev) => ({ ...prev, [name]: true }));
       setErrors((prev) => ({ ...prev, [name]: "" }));
@@ -146,7 +146,8 @@ const PokerPage: React.FC = () => {
     }
   };
 
-  const handleLeave = () => navigate("/mypage");
+  const handleLeave = () =>
+    navigate("/mypage");
 
   const participantName = user?.userName || "Okänd";
   const allVoted = participants.length > 0 && participants.every((name) => locked[name]);
