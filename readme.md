@@ -71,3 +71,7 @@ Then restart the backend.
 To create a production build:
 <pre><code>npm run build</code></pre>
 <hr>
+<h2> Known Bugs</h2>
+<ul>
+<li>User can create a task without name. Needs proper validation</li>
+</ul>
