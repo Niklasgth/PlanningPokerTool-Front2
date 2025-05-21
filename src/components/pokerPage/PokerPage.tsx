@@ -159,7 +159,9 @@ const PokerPage: React.FC = () => {
   //   }
   // };
 
-  const handleLeave = () => navigate("/mypage");
+
+  const handleLeave = () =>
+    navigate("/mypage");
 
   const participantName = user?.userName || "Okänd";
   const allVoted = participants.length > 0 && participants.every((name) => locked[name]);
