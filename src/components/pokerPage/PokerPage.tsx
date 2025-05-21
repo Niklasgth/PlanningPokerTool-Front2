@@ -157,7 +157,7 @@ const PokerPage: React.FC = () => {
   return (
     <div className={styles.container}>
       <h2 className={styles.title}>
-        {loadingTask ? "Laddar..." : `Timepooker – ${task?.taskName || "Okänd uppgift"}`}
+        {loadingTask ? "Laddar..." : `Timepoker – ${task?.taskName || "Okänd uppgift"}`}
       </h2>
       <p className={styles.description}>
         Inloggad som: <strong>{participantName}</strong>
