@@ -3,7 +3,7 @@ import axios from "axios";
 
 export const api = axios.create({
 
-  baseURL: import.meta.env.VITE_API_URL || "https://seahorse-app-xeebi.ondigitalocean.app",
+  baseURL: "https://seahorse-app-xeebi.ondigitalocean.app",
 });
 
 
@@ -31,13 +31,24 @@ export interface TaskEstimate {
   id: string;
   taskId: string;
   userId: string;
-  estimatedDuration: number;
+  estDurationHours: number;
 }
+
+export interface TaskStatsDTO {
+  taskId: string;
+  totalEstimates: number;
+  averageEstimate: number;
+  median: number;
+  stdDeviation: number;
+}
+
 
 // === Task-anrop ===
 export const getTasks = () => api.get<Task[]>("/api/tasks");
 export const getTaskById = (id: string) => api.get<Task>(`/api/task/${id}`);
 export const createTask = (task: Task) => api.post<Task>("/api/task", task);
+export const updateTask = (id: string, updatedFields: Partial<Task>) =>
+  api.patch<Task>(`/api/task/${id}`, updatedFields);
 
 // === User-anrop ===
 export const getUsers = () => api.get<User[]>("/api/users");
@@ -51,5 +62,8 @@ export const loginUser = (data: LoginRequest) =>
 export const getTaskEstimates = () => api.get<TaskEstimate[]>("/api/taskEstimates");
 export const getTaskEstimateById = (id: string) =>
   api.get<TaskEstimate>(`/api/taskEstimate/${id}`);
-export const createTaskEstimate = (taskEstimate: TaskEstimate) =>
+export const createTaskEstimate = (taskEstimate: Omit<TaskEstimate, 'id'>) =>
   api.post<TaskEstimate>("/api/taskEstimate", taskEstimate);
+
+// === Statistik-anrop ===
+export const getStatsByTaskId = (id: string) => api.get<TaskStatsDTO>(`/api/stats/${id}`);

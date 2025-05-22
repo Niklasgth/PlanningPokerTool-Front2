@@ -3,6 +3,7 @@ import Styles from "./MyPage.module.css";
 import { TaskList, NewTaskPopup, StatisticsPanel } from ".";
 import { getTasks } from "../../api/api";
 import type { Task } from "../../api/api";
+import LogOutButton from "../logoutbutton/LogOutButton";
 
 const MyPage: React.FC = () => {
   const [showPopup, setShowPopup] = useState(false);
@@ -21,13 +22,15 @@ const MyPage: React.FC = () => {
   };
 
   useEffect(() => {
-    refreshTasks(); 
+    refreshTasks();
   }, []);
 
   return (
     <div className={Styles.myPageContainer}>
       <div className={Styles.main}>
         <div className={Styles.taskSection}>
+                  <LogOutButton />
+
           <h2>Uppgifter i projektet</h2>
 
           <button
@@ -48,7 +51,7 @@ const MyPage: React.FC = () => {
         </div>
 
         <div className={Styles.statisticsSection}>
-          <StatisticsPanel />
+          <StatisticsPanel tasks={tasks} />
         </div>
       </div>
     </div>

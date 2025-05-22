@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Styles from "./NewTaskPopup.module.css";
 import { createTask } from "../../../api/api";
 import type { Task } from "../../../api/api";
+import LogOutButton from "../../logoutbutton/LogOutButton";
 
 
 interface NewTaskPopupProps {
@@ -15,6 +16,7 @@ const NewTaskPopup: React.FC<NewTaskPopupProps> = ({ onClose, onTaskCreated }) =
   return (
     <div className={Styles.popup}>
       <div className={Styles.popupContent}>
+        <LogOutButton />
         <h3>Skapa ny uppgift</h3>
 
         <label htmlFor="taskName">Uppgiftsnamn</label>

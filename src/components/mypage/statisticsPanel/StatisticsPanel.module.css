@@ -19,8 +19,9 @@
 }
 
 .tabHeader button {
-  flex: 1; /* låt båda knapparna ta lika stor plats */
-  min-width: 0;
+  /* flex: 1; */
+  /* låt båda knapparna ta lika stor plats */
+  /* min-width: 0; */
   padding: 0.6rem 1rem;
 
   font-size: 0.9rem;
@@ -34,8 +35,8 @@
   cursor: pointer;
   transition: background-color 0.2s ease;
 
-  white-space: normal; 
-  overflow: visible;   
+  white-space: normal;
+  overflow: visible;
   text-overflow: unset;
   text-align: center;
 }
@@ -70,10 +71,22 @@ select {
   flex-grow: 1;
   border: 1px solid #444;
   padding: 1rem;
-  background-color: #1a1a1a;
+  color: black;
+  background-color: #dadada;
   border-radius: 0.3rem;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  justify-content: right;
+  align-items: left;
   text-align: center;
+}
+
+.taskDropDown {
+  padding-top: 1rem;
+}
+
+li {
+  font-size: 0.9rem;
+  list-style-type: none;
+  text-align: left;
+
 }
