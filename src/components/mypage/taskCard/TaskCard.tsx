@@ -48,7 +48,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
     if (!task.id) return;
 
     try {
-      const response = await updateTask(task.id, { taskDuration: parsed });
+      await updateTask(task.id, { taskDuration: parsed });
       setDuration(parsed);
       setDurationLogged(true);
       setError("");
