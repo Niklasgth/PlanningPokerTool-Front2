@@ -124,7 +124,7 @@ const PokerPage: React.FC = () => {
       return;
     }
     try {
-      await createTaskEstimate({ taskId: task.id, userId: user.id, estDurationHours: value === "pass" ? 0 : value, });
+      await createTaskEstimate({ taskId: task.id, userId: user.id, estDurationHours: value === "pass" ? 0 : value });
       setTimes((prev) => ({ ...prev, [name]: value }));
       setLocked((prev) => ({ ...prev, [name]: true }));
       setErrors((prev) => ({ ...prev, [name]: "" }));
