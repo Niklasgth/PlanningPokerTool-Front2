@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Styles from "./NewTaskPopup.module.css";
 import { createTask } from "../../../api/api";
-import type { Task } from "../../../api/api";
+import type { CreateTaskDTO } from "../../../api/api";
 import LogOutButton from "../../logoutbutton/LogOutButton";
 
 
@@ -12,12 +12,16 @@ interface NewTaskPopupProps {
 
 const NewTaskPopup: React.FC<NewTaskPopupProps> = ({ onClose, onTaskCreated }) => {
   const [taskName, setTaskName] = useState("");
+  const [taskStory, setTaskStory] = useState("");
+  const [error, setError] = useState("");
 
   return (
     <div className={Styles.popup}>
       <div className={Styles.popupContent}>
         <LogOutButton />
         <h3>Skapa ny uppgift</h3>
+
+        {error && <span className={Styles.error}>{error}</span>}
 
         <label htmlFor="taskName">Uppgiftsnamn</label>
         <input
@@ -27,16 +31,26 @@ const NewTaskPopup: React.FC<NewTaskPopupProps> = ({ onClose, onTaskCreated }) =
           value={taskName}
           onChange={(e) => setTaskName(e.target.value)}
         />
+        <label htmlFor="taskStory">Beskrivning</label>
+        <input
+          id="taskStory"
+          type="text"
+          placeholder="Skriv en kort beskrivning av uppgiften"
+          value={taskStory}
+          onChange={(e) => setTaskStory(e.target.value)}
+        />
 
         <div className={Styles.actions}>
           <button
             onClick={async () => {
+              if (!taskName) {
+                setError("Uppgiftsnamn obligatoriskt!");
+                return;
+              }
               try {
-                const newTask: Task = {
+                const newTask: CreateTaskDTO = {
                   taskName: taskName,
-                  taskStory: "Beskrivning här",
-                  taskDuration: 0,
-                  assignedUserId: "demo-user"
+                  taskStory: taskStory
                 };
 
                 await createTask(newTask);
