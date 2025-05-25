@@ -185,43 +185,43 @@ const PokerPage: React.FC = () => {
         )}
       </div>
 
-      {/* === Inputfält och knappar för varje deltagare === */}
-      <div className={styles.participantList}>
-        {participants.map((name) => (
-          <div key={name} className={styles.participantRow}>
+      {/* === Inputfält och knappar för den inloggade användaren === */}
+      {user && (
+        <div className={styles.participantList}>
+          <div className={styles.participantRow}>
             <div className={styles.inputGroup}>
-              <span className={styles.participantName}>{name}</span>
+              <span className={styles.participantName}>{user.userName}</span>
               <input
                 type="number"
                 className={styles.input}
                 placeholder="timmar"
-                value={typeof times[name] === "number" ? times[name] : ""}
+                value={typeof times[user.userName] === "number" ? times[user.userName] : ""}
                 min={0}
                 max={40}
-                onChange={(e) => handleChange(name, e.target.value)}
-                disabled={locked[name] || name !== participantName}
+                onChange={(e) => handleChange(user.userName, e.target.value)}
+                disabled={locked[user.userName]}
               />
             </div>
             <div className={styles.buttonGroup}>
               <button
                 className={styles.voteButton}
-                onClick={() => handleVote(name, times[name])}
-                disabled={locked[name] || times[name] === "pass" || times[name] === undefined || name !== participantName}
+                onClick={() => handleVote(user.userName, times[user.userName])}
+                disabled={locked[user.userName] || times[user.userName] === "pass" || times[user.userName] === undefined}
               >
-                {locked[name] || times[name] == "pass" ? "🔒 Låst" : "Rösta"}
+                {locked[user.userName] || times[user.userName] == "pass" ? "🔒 Låst" : "Rösta"}
               </button>
               <button
                 className={styles.voteButton}
-                onClick={() => handleVote(name, "pass")}
-                disabled={locked[name] || name !== participantName}
+                onClick={() => handleVote(user.userName, "pass")}
+                disabled={locked[user.userName]}
               >
-                {locked[name] || times[name] === "pass" ? "🔒 Pass" : "Pass"}
+                {locked[user.userName] || times[user.userName] === "pass" ? "🔒 Pass" : "Pass"}
               </button>
             </div>
-            {errors[name] && <div className={styles.error}>{errors[name]}</div>}
+            {errors[user.userName] && <div className={styles.error}>{errors[user.userName]}</div>}
           </div>
-        ))}
-      </div>
+        </div>
+      )}
 
       {/* === Resultatruta – visas när alla röstat === */}
       {allVoted && taskStats ? (
