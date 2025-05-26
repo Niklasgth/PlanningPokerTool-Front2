@@ -128,9 +128,9 @@ const PokerPage: React.FC = () => {
   // === Allmän för både "Rösta" och "Pass" ===
   const handleVote = async (name: string, value: number | "pass") => {
     if (locked[name]) {
-  console.warn(`${name} har redan röstat – ignorera klick`);
-  return;
-}
+      console.warn(`${name} har redan röstat – ignorera klick`);
+      return;
+    }
 
     if (name !== participantName || !user || !task || !task.id) return;
     if (value === undefined) {
@@ -183,16 +183,16 @@ const PokerPage: React.FC = () => {
   const handleLeave = () =>
     navigate("/mypage");
 
-const handleEndVoteConfirm = async () => {
- if (!task?.id) return;
+  const handleEndVoteConfirm = async () => {
+    if (!task?.id) return;
 
-  try {
-    await forcePassVotes(task.id, participants, locked);
-    navigate("/mypage");
-  } catch (err) {
-    console.error("Kunde inte avsluta omröstning:", err);
-  }
-};
+    try {
+      await forcePassVotes(task.id, participants, locked);
+      navigate("/mypage");
+    } catch (err) {
+      console.error("Kunde inte avsluta omröstning:", err);
+    }
+  };
 
 
   const participantName = user?.userName || "Okänd";
@@ -204,8 +204,11 @@ const handleEndVoteConfirm = async () => {
     <div className={styles.fullScreenBackground}>
       <div className={styles.container}>
         <h2 className={styles.title}>
-          {loadingTask ? "Laddar..." : `Timepoker – ${task?.taskName || "Okänd uppgift"}`}
+          {loadingTask ? "Laddar..." : `Task: ${task?.taskName || "Okänd uppgift"}`}
         </h2>
+        <p className={styles.description}>
+          {loadingTask ? "Laddar..." : <span><strong>Story:</strong> {task?.taskStory || "Ingen story"}</span>}
+        </p>
         <p className={styles.description}>
           Inloggad som: <strong>{participantName}</strong>
         </p>
@@ -226,7 +229,7 @@ const handleEndVoteConfirm = async () => {
           <div className={styles.participantList}>
             <div className={styles.participantRow}>
               <div className={styles.inputGroup}>
-                <span className={styles.participantName}>{user.userName}</span>
+                {/* <span className={styles.participantName}>{user.userName}</span> */}
                 <input
                   type="number"
                   className={styles.input}
