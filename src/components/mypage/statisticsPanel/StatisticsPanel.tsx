@@ -33,6 +33,15 @@ const StatisticsPanel: React.FC<TaskStatsProps> = ({ tasks }) => {
     }
   };
 
+const getSpreadLabel = (std: number) => {
+  if (std === 0) return "🟢 Ingen variation";
+  if (std < 1) return "🟢 Låg variation";
+  if (std < 3) return "🟡 Måttlig variation";
+  return "🔴 Hög variation";
+};
+
+
+
   return (
     <div className={Styles.panel}>
       <div className={Styles.tabHeader}>
@@ -69,24 +78,41 @@ const StatisticsPanel: React.FC<TaskStatsProps> = ({ tasks }) => {
             <div>
               <h4>Allmän statistik</h4>
               <ul>
-                <li>Totalt antal uppgifter: {allStats.totalTasks}</li>
-                <li>Antal avslutade uppgifter: {allStats.totalCompletedTasks}</li>
-                <li>Genomsnittlig precision: {allStats.avgAccuracy.toFixed(2)}</li>
-                <li>Genomsnittlig antal röster: {allStats.avgEstimateCount.toFixed(2)}</li>
-                <li>Genomsnittlig loggad tid: {allStats.avgActualDuration.toFixed(2)}</li>
-                <li>Genomsnittlig estimerad tid: {allStats.avgEstimateValue.toFixed(2)}</li>
+                <li>Avslutade uppgifter: {allStats.totalCompletedTasks} av {allStats.totalTasks}</li>
+                <li>Genomsnittlig faktisk tid uppgifter tagit: {allStats.avgActualDuration.toFixed(2)} timmar</li>
+                <li>Genomsnittlig uppskattad tid per uppgift: {allStats.avgEstimateValue.toFixed(2)} timmar</li>
+                <li>Precision (uppskattad tid vs tid det faktiskt tog): {(allStats.avgAccuracy * 100).toFixed(0)}%</li>
+                <li>Antal röster per uppgift (snitt): {allStats.avgEstimateCount.toFixed(2)}</li>
               </ul>
+
             </div>
 
           ) : selectedTaskId && taskStats ? (
             <div>
               <h4>{tasks.find(t => t.id === selectedTaskId)?.taskName}</h4>
-              <ul>
-                <li>Antal röster: {taskStats.totalEstimates}</li>
-                <li>Medelvärde: {taskStats.averageEstimate.toFixed(2)}</li>
-                <li>Median: {taskStats.median.toFixed(2)}</li>
-                <li>Standardavvikelse: {taskStats.stdDeviation.toFixed(2)}</li>
+             <ul>
+                <li>Antal giltiga röster: {taskStats.totalEstimates}</li>
+                <li>Genomsnittlig gissad tid på uppgift: {taskStats.averageEstimate.toFixed(2)} timmar</li>
+                <li>Medianvärde gissad tid på uppgift: {taskStats.median.toFixed(2)} timmar</li>
+
+                <hr className={Styles.divider} />
+                <li>
+                  Spridning bland gissningarna: {taskStats.stdDeviation.toFixed(2)} timmar – {getSpreadLabel(taskStats.stdDeviation)}
+                </li>
+
+                <li>Majoriteten av gissningarna låg mellan: {Math.max(0, (taskStats.averageEstimate - taskStats.stdDeviation)).toFixed(1)} – {(taskStats.averageEstimate + taskStats.stdDeviation).toFixed(1)} timmar</li>
+                <li>{
+                  (() => {
+                    const diff = taskStats.averageEstimate - taskStats.median;
+                    if (Math.abs(diff) < 0.5) return "Snitt och median på gissningarna ligger nära varandra";
+                    if (diff > 0.5) return "Snittet påverkas av höga gissningar";
+                    return "Snittet påverkas av låga gissningar";
+                  })()
+                }</li>
               </ul>
+
+
+
             </div>
           ) : (
             <p>Välj en uppgift för att se statistik</p>
