@@ -128,9 +128,9 @@ const PokerPage: React.FC = () => {
   // === Allmän för både "Rösta" och "Pass" ===
   const handleVote = async (name: string, value: number | "pass") => {
     if (locked[name]) {
-  console.warn(`${name} har redan röstat – ignorera klick`);
-  return;
-}
+      console.warn(`${name} har redan röstat – ignorera klick`);
+      return;
+    }
 
     if (name !== participantName || !user || !task || !task.id) return;
     if (value === undefined) {
@@ -183,16 +183,16 @@ const PokerPage: React.FC = () => {
   const handleLeave = () =>
     navigate("/mypage");
 
-const handleEndVoteConfirm = async () => {
- if (!task?.id) return;
+  const handleEndVoteConfirm = async () => {
+    if (!task?.id) return;
 
-  try {
-    await forcePassVotes(task.id, participants, locked);
-    navigate("/mypage");
-  } catch (err) {
-    console.error("Kunde inte avsluta omröstning:", err);
-  }
-};
+    try {
+      await forcePassVotes(task.id, participants, locked);
+      navigate("/mypage");
+    } catch (err) {
+      console.error("Kunde inte avsluta omröstning:", err);
+    }
+  };
 
 
   const participantName = user?.userName || "Okänd";
@@ -221,7 +221,7 @@ const handleEndVoteConfirm = async () => {
           )} <br />
         </div>
 
-        {/* === Inputfält och knappar för den inloggade användaren === */}
+        {/* === Inputfält och knappar för den inloggade användarenaaaaa === */}
         {user && (
           <div className={styles.participantList}>
             <div className={styles.participantRow}>
