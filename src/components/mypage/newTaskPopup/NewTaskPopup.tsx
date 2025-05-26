@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import Styles from "./NewTaskPopup.module.css";
 import { createTask } from "../../../api/api";
 import type { CreateTaskDTO } from "../../../api/api";
-import LogOutButton from "../../logoutbutton/LogOutButton";
 
 
 interface NewTaskPopupProps {

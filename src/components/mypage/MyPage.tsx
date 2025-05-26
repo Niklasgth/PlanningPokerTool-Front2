@@ -46,8 +46,10 @@ const MyPage: React.FC = () => {
               onTaskCreated={refreshTasks}
             />
           )}
-
-          <TaskList tasks={tasks} />
+          <div className={Styles.taskListWrapper}>
+            <TaskList tasks={tasks} />
+          </div>
+          {/* <TaskList tasks={tasks} /> */}
         </div>
 
         <div className={Styles.statisticsSection}>

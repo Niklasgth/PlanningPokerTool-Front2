@@ -174,6 +174,7 @@ const PokerPage: React.FC = () => {
   const remaining = participants.filter((name) => !locked[name]);
 
   return (
+  <div className={styles.fullScreenBackground}>
     <div className={styles.container}>
       <h2 className={styles.title}>
         {loadingTask ? "Laddar..." : `Timepoker – ${task?.taskName || "Okänd uppgift"}`}
@@ -245,6 +246,7 @@ const PokerPage: React.FC = () => {
         <button className={styles.endButton} onClick={handleLeave}>Lämna omröstningen</button>
       </div>
     </div>
+  </div>
   );
 };
 

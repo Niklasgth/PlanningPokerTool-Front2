@@ -2,7 +2,7 @@
   padding: 2rem;
   max-width: 40rem;
   margin: 2rem auto;
-  background-color: white;
+  background-color: rgba(255, 255, 255, 0.679);
   border-radius: 1rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   color: #111;
@@ -61,7 +61,7 @@
   padding-top: 1rem;
   font-size: 1rem;
   color: #222;
-    text-align: center; 
+  text-align: center; 
 }
 
 
@@ -148,4 +148,14 @@
   margin-top: 0.25rem;
   margin-left: 0.5rem;
 }
-
+.fullScreenBackground {
+    height: 100vh;
+    width: 100vw;
+    background-image: url('/poker.png'); 
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
