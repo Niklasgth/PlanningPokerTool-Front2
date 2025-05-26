@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import styles from "./PokerPage.module.css";
-import { getTaskById, getUsers, getTaskEstimates, createTaskEstimate, getStatsByTaskId } from "../../api/api";
+import { getTaskById, getTaskEstimates, createTaskEstimate, getStatsByTaskId } from "../../api/api";
 import type { Task, User, TaskEstimate, TaskStatsDTO } from "../../api/api";
 import EndVotePopup from "../../components/pokerPage/endVotePopup/EndVotePopup";
 import { forcePassVotes } from "../../utils/forcePassVotes";
@@ -39,35 +39,94 @@ const PokerPage: React.FC = () => {
 
 
   // === Hämta task från backend ===
-  useEffect(() => {
+  // useEffect(() => {
+  //   const fetchTask = async () => {
+  //     try {
+  //       if (id) {
+  //         const response = await getTaskById(id);
+  //         // const taskData = response.data;
+  //         // setTask(taskData);
+  //         setTask(response.data);
+  //       }
+  //     } catch (error) {
+  //       console.error("Kunde inte hämta task:", error);
+  //     } finally {
+  //       setLoadingTask(false);
+  //     }
+  //   };
+  //   fetchTask();
+  // }, [id]);
+
+    useEffect(() => {
     const fetchTask = async () => {
-      try {
-        if (id) {
-          const response = await getTaskById(id);
-          setTask(response.data);
-        }
-      } catch (error) {
-        console.error("Kunde inte hämta task:", error);
-      } finally {
-        setLoadingTask(false);
+      if (id) {
+        const response = await getTaskById(id);
+        setTask(response.data);
       }
+      setLoadingTask(false);
     };
     fetchTask();
   }, [id]);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) setUser(JSON.parse(storedUser));
+    else navigate("/");
+  }, [navigate]);
+
+    useEffect(() => {
+    const fetchEstimatesAndStats = async () => {
+      if (!id || !user) return;
+      try {
+        const [estimatesRes, statsRes] = await Promise.all([
+          getTaskEstimates(),
+          getStatsByTaskId(id)
+        ]);
+        const allEstimates: TaskEstimate[] = estimatesRes.data;
+        const assignedUserIds = task?.assignedUsers?.map(u => u.id) || [];
+        // Only count estimates from assigned users
+        const votes = allEstimates.filter(e => e.taskId === id && assignedUserIds.includes(e.userId));
+        // Mark locked for assigned users only
+        let newLocked: { [name: string]: boolean } = {};
+        let newTimes: { [name: string]: number | "pass" } = {};
+        task?.assignedUsers?.forEach((u) => {
+          const found = votes.find(e => e.userId === u.id);
+          if (found) {
+            newLocked[u.userName] = true;
+            newTimes[u.userName] = found.estDurationHours || "pass";
+          }
+        });
+        setLocked(newLocked);
+        setTimes(newTimes);
+        setTaskStats(statsRes.data);
+      } catch (err) {
+        console.error("Fel vid hämtning av estimates/statistik:", err);
+      }
+    };
+    fetchEstimatesAndStats();
+  }, [id, user, task]);
 
   // === Hämta användarlista från backend ===
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await getUsers();
-        const usernames = res.data.map((u: User) => u.userName);
+        // const res = await getUsers();
+        // const usernames = res.data.map((u: User) => u.userName);
+        // setParticipants(usernames);
+        if (id) {
+          const taskRes = await getTaskById(id);
+          setTask(taskRes.data);
+            const usernames = Array.isArray(taskRes.data.assignedUsers)
+          ? taskRes.data.assignedUsers.map((u: User) => u.userName)
+          : [];
         setParticipants(usernames);
+        }
       } catch (error) {
         console.error("Kunde inte hämta användare:", error);
       }
     };
     fetchUsers();
-  }, []);
+  }, [id]);
 
   // === Kolla om användaren är inloggad, annars redirect ===
   useEffect(() => {
@@ -196,9 +255,24 @@ const handleEndVoteConfirm = async () => {
 
 
   const participantName = user?.userName || "Okänd";
+  const assignedUsers = task?.assignedUsers || [];
+  // const assignedUserNames = assignedUsers.map(u => u.userName);
+  const userIsAssigned = assignedUsers.some(u => u.id === user?.id);
+
+      if (!userIsAssigned) {
+    return <div className={styles.fullScreenBackground}>
+      <div className={styles.container}>
+        <h2 className={styles.title}>{task?.taskName}</h2>
+        <p>Du är inte deltagare i denna uppgift.</p>
+        <button onClick={() => navigate("/mypage")}>Tillbaka</button>
+      </div>
+    </div>
+  }
   const allVoted = participants.length > 0 && participants.every((name) => locked[name]);
   const votedCount = Object.values(locked).filter(Boolean).length;
   const remaining = participants.filter((name) => !locked[name]);
+
+
 
   return (
     <div className={styles.fullScreenBackground}>
