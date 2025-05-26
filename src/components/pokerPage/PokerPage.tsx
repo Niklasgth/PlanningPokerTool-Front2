@@ -201,97 +201,97 @@ const handleEndVoteConfirm = async () => {
   const remaining = participants.filter((name) => !locked[name]);
 
   return (
-  <div className={styles.fullScreenBackground}>
-    <div className={styles.container}>
-      <h2 className={styles.title}>
-        {loadingTask ? "Laddar..." : `Timepoker – ${task?.taskName || "Okänd uppgift"}`}
-      </h2>
-      <p className={styles.description}>
-        Inloggad som: <strong>{participantName}</strong>
-      </p>
+    <div className={styles.fullScreenBackground}>
+      <div className={styles.container}>
+        <h2 className={styles.title}>
+          {loadingTask ? "Laddar..." : `Timepoker – ${task?.taskName || "Okänd uppgift"}`}
+        </h2>
+        <p className={styles.description}>
+          Inloggad som: <strong>{participantName}</strong>
+        </p>
 
-      {/* === Info om röster === */}
-      <div className={styles.voteInfo}>
-        <p><strong>{votedCount}/{participants.length}</strong> deltagare har röstat.</p>
-        {remaining.length > 0 && (
-          <p>Väntar på: {remaining.join(", ")}</p>
-        )}
+        {/* === Info om röster === */}
+        <div className={styles.voteInfo}>
+          <p><strong>{votedCount}/{participants.length}</strong> deltagare har röstat.</p>
+          {remaining.length > 0 && (
+            <p>Väntar på: {remaining.join(", ")}</p>
+          )}
           {errors[participantName] && (
-        <div className={styles.error}>{errors[participantName]}</div>
-        )} <br />
-      </div>
+            <div className={styles.error}>{errors[participantName]}</div>
+          )} <br />
+        </div>
 
-      {/* === Inputfält och knappar för den inloggade användaren === */}
-      {user && (
-        <div className={styles.participantList}>
-          <div className={styles.participantRow}>
-            <div className={styles.inputGroup}>
-              <span className={styles.participantName}>{user.userName}</span>
-              <input
-                type="number"
-                className={styles.input}
-                placeholder="timmar"
-                value={typeof times[name] === "number" ? times[name] : ""}
-                min={1}
-                max={40}
-                onChange={(e) => handleChange(user.userName, e.target.value)}
-                disabled={locked[user.userName]}
-              />
+        {/* === Inputfält och knappar för den inloggade användaren === */}
+        {user && (
+          <div className={styles.participantList}>
+            <div className={styles.participantRow}>
+              <div className={styles.inputGroup}>
+                <span className={styles.participantName}>{user.userName}</span>
+                <input
+                  type="number"
+                  className={styles.input}
+                  placeholder="timmar"
+                  value={typeof times[user.userName] === "number" ? times[user.userName] : ""}
+                  min={1}
+                  max={40}
+                  onChange={(e) => handleChange(user.userName, e.target.value)}
+                  disabled={locked[user.userName]}
+                />
+              </div>
+              <div className={styles.buttonGroup}>
+                <button
+                  className={styles.voteButton}
+                  onClick={() => handleVote(user.userName, times[user.userName])}
+                  disabled={locked[user.userName] || times[user.userName] === "pass" || user.userName !== participantName}
+                >
+                  {locked[user.userName] || times[user.userName] == "pass" ? "🔒 Låst" : "Rösta"}
+                </button>
+                <button
+                  className={styles.voteButton}
+                  onClick={() => handleVote(user.userName, "pass")}
+                  disabled={locked[user.userName]}
+                >
+                  {locked[user.userName] || times[user.userName] === "pass" ? "🔒 Pass" : "Pass"}
+                </button>
+              </div>
+              {/* {errors[name] && <div className={styles.error}>{errors[name]}</div>} */}
             </div>
-            <div className={styles.buttonGroup}>
-              <button
-                className={styles.voteButton}
-                onClick={() => handleVote(name, times[name])}
-                disabled={locked[name] || times[name] === "pass" || name !== participantName}
-              >
-                {locked[user.userName] || times[user.userName] == "pass" ? "🔒 Låst" : "Rösta"}
-              </button>
-              <button
-                className={styles.voteButton}
-                onClick={() => handleVote(user.userName, "pass")}
-                disabled={locked[user.userName]}
-              >
-                {locked[user.userName] || times[user.userName] === "pass" ? "🔒 Pass" : "Pass"}
-              </button>
-            </div>
-            {/* {errors[name] && <div className={styles.error}>{errors[name]}</div>} */}
           </div>
+        )}
+
+        {/* === Resultatruta – visas när alla röstat === */}
+        {allVoted && taskStats ? (
+          <div className={styles.resultSection}>
+            <p><strong>Medelvärde:</strong> {taskStats.averageEstimate.toFixed(2)} timmar</p>
+            <p><strong>Median:</strong> {taskStats.median.toFixed(2)} timmar</p>
+            <p><strong>Standardavvikelse:</strong> {taskStats.stdDeviation.toFixed(2)} timmar</p>
+          </div>
+        ) : null}
+
+        {/* === Lämna omröstningen eller Avsluta omröstningen === */}
+        <div className={styles.controlButtons}>
+          <button className={styles.leaveButton} onClick={handleLeave}>
+            Lämna omröstningen
+          </button>
+
+          <button className={styles.endButton} onClick={() => setShowEndPopup(true)}>
+            Avsluta omröstning
+          </button>
+
+          <p className={styles.endInfo}>
+            Detta avslutar omröstningen för alla deltagare.
+          </p>
         </div>
-      )}
 
-      {/* === Resultatruta – visas när alla röstat === */}
-      {allVoted && taskStats ? (
-        <div className={styles.resultSection}>
-          <p><strong>Medelvärde:</strong> {taskStats.averageEstimate.toFixed(2)} timmar</p>
-          <p><strong>Median:</strong> {taskStats.median.toFixed(2)} timmar</p>
-          <p><strong>Standardavvikelse:</strong> {taskStats.stdDeviation.toFixed(2)} timmar</p>
-        </div>
-      ) : null}
+        {showEndPopup && (
+          <EndVotePopup
+            onConfirm={handleEndVoteConfirm}
+            onCancel={() => setShowEndPopup(false)}
+          />
+        )}
 
- {/* === Lämna omröstningen eller Avsluta omröstningen === */}
-<div className={styles.controlButtons}>
-  <button className={styles.leaveButton} onClick={handleLeave}>
-    Lämna omröstningen
-  </button>
-
-  <button className={styles.endButton} onClick={() => setShowEndPopup(true)}>
-    Avsluta omröstning
-  </button>
-
-  <p className={styles.endInfo}>
-    Detta avslutar omröstningen för alla deltagare.
-  </p>
-</div>
-
-  {showEndPopup && (
-  <EndVotePopup
-    onConfirm={handleEndVoteConfirm}
-    onCancel={() => setShowEndPopup(false)}
-  />
-)}
-
-</div> 
-
+      </div>
+    </div>
   );
 };
 
