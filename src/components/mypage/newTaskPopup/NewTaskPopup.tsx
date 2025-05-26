@@ -18,7 +18,6 @@ const NewTaskPopup: React.FC<NewTaskPopupProps> = ({ onClose, onTaskCreated }) =
   return (
     <div className={Styles.popup}>
       <div className={Styles.popupContent}>
-        <LogOutButton />
         <h3>Skapa ny uppgift</h3>
 
         {error && <span className={Styles.error}>{error}</span>}

@@ -108,8 +108,9 @@ const PokerPage: React.FC = () => {
     if (name !== participantName) return;
     if (locked[name]) return;
     const num = parseInt(value);
-    if (isNaN(num)) {
-      setErrors((prev) => ({ ...prev, [name]: "Ange ett heltal eller välj Pass." }));
+    if (isNaN(num) || num <= 0) {
+
+      setErrors((prev) => ({ ...prev, [name]: "Du kan inte ange negativa timmar eller välj Pass." }));
       return;
     }
     setTimes((prev) => ({ ...prev, [name]: num }));
@@ -119,6 +120,10 @@ const PokerPage: React.FC = () => {
   // === Allmän för både "Rösta" och "Pass" ===
   const handleVote = async (name: string, value: number | "pass") => {
     if (name !== participantName || !user || !task || !task.id) return;
+    if (value === undefined) {
+      setErrors((prev) => ({ ...prev, [name]: "Du måste ange ett tal eller pass innan du röstar." }));
+      return;
+    }
     try {
       await createTaskEstimate({ taskId: task.id, userId: user.id, estDurationHours: value === "pass" ? 0 : value });
       setTimes((prev) => ({ ...prev, [name]: value }));
@@ -183,6 +188,9 @@ const PokerPage: React.FC = () => {
         {remaining.length > 0 && (
           <p>Väntar på: {remaining.join(", ")}</p>
         )}
+          {errors[participantName] && (
+        <div className={styles.error}>{errors[participantName]}</div>
+        )} <br />
       </div>
 
       {/* === Inputfält och knappar för den inloggade användaren === */}
@@ -195,8 +203,10 @@ const PokerPage: React.FC = () => {
                 type="number"
                 className={styles.input}
                 placeholder="timmar"
-                value={typeof times[user.userName] === "number" ? times[user.userName] : ""}
-                min={0}
+
+                value={typeof times[name] === "number" ? times[name] : ""}
+                min={1}
+
                 max={40}
                 onChange={(e) => handleChange(user.userName, e.target.value)}
                 disabled={locked[user.userName]}
@@ -205,8 +215,10 @@ const PokerPage: React.FC = () => {
             <div className={styles.buttonGroup}>
               <button
                 className={styles.voteButton}
-                onClick={() => handleVote(user.userName, times[user.userName])}
-                disabled={locked[user.userName] || times[user.userName] === "pass" || times[user.userName] === undefined}
+
+                onClick={() => handleVote(name, times[name])}
+                disabled={locked[name] || times[name] === "pass" || name !== participantName}
+
               >
                 {locked[user.userName] || times[user.userName] == "pass" ? "🔒 Låst" : "Rösta"}
               </button>
@@ -218,7 +230,9 @@ const PokerPage: React.FC = () => {
                 {locked[user.userName] || times[user.userName] === "pass" ? "🔒 Pass" : "Pass"}
               </button>
             </div>
-            {errors[user.userName] && <div className={styles.error}>{errors[user.userName]}</div>}
+
+            {/* {errors[name] && <div className={styles.error}>{errors[name]}</div>} */}
+
           </div>
         </div>
       )}
