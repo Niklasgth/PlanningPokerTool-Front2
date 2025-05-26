@@ -42,11 +42,16 @@ export interface TaskStatsDTO {
   stdDeviation: number;
 }
 
+export interface CreateTaskDTO {
+  taskName: string;
+  taskStory: string;
+}
+
 
 // === Task-anrop ===
 export const getTasks = () => api.get<Task[]>("/api/tasks");
 export const getTaskById = (id: string) => api.get<Task>(`/api/task/${id}`);
-export const createTask = (task: Task) => api.post<Task>("/api/task", task);
+export const createTask = (task: CreateTaskDTO) => api.post<Task>("/api/task", task);
 export const updateTask = (id: string, updatedFields: Partial<Task>) =>
   api.patch<Task>(`/api/task/${id}`, updatedFields);
 

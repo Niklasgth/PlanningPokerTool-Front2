@@ -32,3 +32,10 @@ input {
   justify-content: space-between;
   gap: 1rem;
 }
+
+.error {
+  color: #dc2626;
+  font-size: 0.9rem;
+  margin-top: 0.25rem;
+  text-align: center;
+}
