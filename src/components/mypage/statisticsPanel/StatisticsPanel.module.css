@@ -1,92 +1,70 @@
 .panel {
-  background-color: #111;
-  color: white;
+  background-color: #11111190;
   padding: 1rem;
-  padding-top: 1rem;
-  border-radius: 0.5rem;
-  border: 1px solid #333;
   height: 100%;
+  color: #f0f0f0;
   display: flex;
   flex-direction: column;
-  box-sizing: border-box;
-  width: 100%;
+  gap: 1rem;
+  margin-top: 9rem;
 }
 
 .tabHeader {
   display: flex;
-  gap: 0.5rem;
-  width: 100%;
+  justify-content: center;
+  gap: 1rem;
 }
 
 .tabHeader button {
-  /* flex: 1; */
-  /* låt båda knapparna ta lika stor plats */
-  /* min-width: 0; */
-  padding: 0.6rem 1rem;
-
-  font-size: 0.9rem;
-  line-height: 1.2;
-  font-weight: bold;
-
   background-color: #333;
-  color: white;
+  color: #fff;
   border: none;
-  border-radius: 0.4rem;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
-
-  white-space: normal;
-  overflow: visible;
-  text-overflow: unset;
-  text-align: center;
-}
-
-
-
-.tabHeader button:hover {
-  background-color: #444;
+  font-weight: 600;
 }
 
 .active {
-  background-color: #e1ab52;
-  color: black;
-}
-
-label {
-  margin-bottom: 0.5rem;
-  display: block;
-}
-
-select {
-  width: 100%;
-  padding: 0.5rem;
-  background-color: #222;
-  color: white;
-  border: 1px solid #444;
-  border-radius: 0.3rem;
-  margin-bottom: 1rem;
-}
-
-.statsBox {
-  flex-grow: 1;
-  border: 1px solid #444;
-  padding: 1rem;
-  color: black;
-  background-color: #dadada;
-  border-radius: 0.3rem;
-  display: flex;
-  justify-content: right;
-  align-items: left;
-  text-align: center;
+  background-color: #666;
 }
 
 .taskDropDown {
-  padding-top: 1rem;
+  display: flex;
+  justify-content: center;
 }
 
-li {
-  font-size: 0.9rem;
-  list-style-type: none;
-  text-align: left;
+.taskDropDown select {
+  padding: 0.5rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background-color: #222;
+  color: #fff;
+}
 
+.statsBox {
+  background-color: #1c1c1c;
+  border-radius: 1rem;
+  padding: 2rem;
+  text-align: center;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.statsBox h4 {
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  color: #ffffff;
+}
+
+.statsBox ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.statsBox li {
+  margin: 0.5rem 0;
+  font-size: 1rem;
+  color: #ddd;
 }
