@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import Styles from "./StatisticsPanel.module.css";
 import { getStatsByTaskId, getAllStats, type Task, type TaskStatsDTO, type StatsDTO } from "../../../api/api";
 import StatisticsGraph from "./StatisticsGraph";
+import TaskStatsGraph from "./TaskStatsGraph";
+import { all } from "axios";
 
 interface TaskStatsProps {
   tasks: Task[];
@@ -19,6 +21,7 @@ const StatisticsPanel: React.FC<TaskStatsProps> = ({ tasks }) => {
     if (taskId === "all") {
       const stats = await getAllStats();
       setAllStats(stats.data);
+      setTaskStats(null);
     } else {
       setAllStats(null);
     }
@@ -26,6 +29,7 @@ const StatisticsPanel: React.FC<TaskStatsProps> = ({ tasks }) => {
     if (taskId) {
       const stats = await getStatsByTaskId(taskId);
       setTaskStats(stats.data);
+      setAllStats(null);
     } else {
       setTaskStats(null);
     }
@@ -116,7 +120,9 @@ const StatisticsPanel: React.FC<TaskStatsProps> = ({ tasks }) => {
             <p>Välj en uppgift för att se statistik</p>
           )
         ) : (
-          <StatisticsGraph allStats={allStats} />
+          selectedTaskId === "all"
+            ? <StatisticsGraph allStats={allStats} />
+            : <TaskStatsGraph taskStats={taskStats} />
         )}
       </div>
     </div>
