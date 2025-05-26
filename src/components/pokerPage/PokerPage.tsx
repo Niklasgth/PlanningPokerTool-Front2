@@ -109,6 +109,7 @@ const PokerPage: React.FC = () => {
     if (locked[name]) return;
     const num = parseInt(value);
     if (isNaN(num) || num <= 0) {
+
       setErrors((prev) => ({ ...prev, [name]: "Du kan inte ange negativa timmar eller välj Pass." }));
       return;
     }
