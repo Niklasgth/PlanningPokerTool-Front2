@@ -1,22 +1,21 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Styles from "./StatisticsPanel.module.css";
 import { getStatsByTaskId, getAllStats, type Task, type TaskStatsDTO, type StatsDTO } from "../../../api/api";
-
+import StatisticsGraph from "./StatisticsGraph";
 
 interface TaskStatsProps {
   tasks: Task[];
 }
 
 const StatisticsPanel: React.FC<TaskStatsProps> = ({ tasks }) => {
-  const [activeTab, setActiveTab] = useState<"statistik" | "vis">("statistik");
-  const [selectedTaskId, setSelectedTaskId] = useState<string>("");
+  const [activeTab, setActiveTab] = useState<"statistik" | "vis">("vis");
+  const [selectedTaskId, setSelectedTaskId] = useState<string>("all");
   const [taskStats, setTaskStats] = useState<TaskStatsDTO | null>(null);
   const [allStats, setAllStats] = useState<StatsDTO | null>(null);
 
   const handleTaskChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     const taskId = e.target.value;
     setSelectedTaskId(taskId);
-    // if 'Alla uppgifter' is selected
     if (taskId === "all") {
       const stats = await getAllStats();
       setAllStats(stats.data);
@@ -24,7 +23,6 @@ const StatisticsPanel: React.FC<TaskStatsProps> = ({ tasks }) => {
       setAllStats(null);
     }
 
-    // If a task is selected
     if (taskId) {
       const stats = await getStatsByTaskId(taskId);
       setTaskStats(stats.data);
@@ -33,33 +31,49 @@ const StatisticsPanel: React.FC<TaskStatsProps> = ({ tasks }) => {
     }
   };
 
+  const getSpreadLabel = (std: number) => {
+    if (std === 0) return "🟢 Ingen variation";
+    if (std < 1) return "🟢 Låg variation";
+    if (std < 3) return "🟡 Måttlig variation";
+    return "🔴 Hög variation";
+  };
+
+  // === Ladda projektöversikt vid sidladdning ===
+  useEffect(() => {
+    const fetchAllStats = async () => {
+      const stats = await getAllStats();
+      setAllStats(stats.data);
+      setSelectedTaskId("all");
+    };
+    fetchAllStats();
+  }, []);
+
   return (
     <div className={Styles.panel}>
       <div className={Styles.tabHeader}>
         <button
-          className={activeTab === "statistik" ? Styles.active : ""}
+          className={`${Styles.tabButton} ${activeTab === "statistik" ? Styles.activeStat : ""}`}
           onClick={() => setActiveTab("statistik")}
         >
-          Statistik
+          📋 Statistik
         </button>
         <button
-          className={activeTab === "vis" ? Styles.active : ""}
+          className={`${Styles.tabButton} ${activeTab === "vis" ? Styles.activeVis : ""}`}
           onClick={() => setActiveTab("vis")}
         >
-          Stat vis
+          📈 Visa grafer
         </button>
       </div>
 
       <div className={Styles.taskDropDown}>
-        {/* <label htmlFor="task-select">Dropdown</label> */}
         <select id="task-select" value={selectedTaskId} onChange={handleTaskChange}>
-          <option value="">Välj uppgift</option>
-          <option value="all">Alla uppgifter</option>
-          {Array.isArray(tasks) && tasks.map((task) => (
-            <option key={task.id} value={task.id}>
-              {task.taskName}
-            </option>
-          ))}
+          <option value="all">Visa projektöversikt</option>
+          {Array.isArray(tasks) &&
+            tasks.map((task) => (
+              <option key={task.id} value={task.id}>
+                {task.taskName}
+              </option>
+            ))}
         </select>
       </div>
 
@@ -69,30 +83,40 @@ const StatisticsPanel: React.FC<TaskStatsProps> = ({ tasks }) => {
             <div>
               <h4>Allmän statistik</h4>
               <ul>
-                <li>Totalt antal uppgifter: {allStats.totalTasks}</li>
-                <li>Antal avslutade uppgifter: {allStats.totalCompletedTasks}</li>
-                <li>Genomsnittlig precision: {allStats.avgAccuracy.toFixed(2)}</li>
-                <li>Genomsnittlig antal röster: {allStats.avgEstimateCount.toFixed(2)}</li>
-                <li>Genomsnittlig loggad tid: {allStats.avgActualDuration.toFixed(2)}</li>
-                <li>Genomsnittlig estimerad tid: {allStats.avgEstimateValue.toFixed(2)}</li>
+                <li>Avslutade uppgifter: {allStats.totalCompletedTasks} av {allStats.totalTasks}</li>
+                <li>Genomsnittlig faktisk tid uppgifter tagit: {allStats.avgActualDuration.toFixed(2)} timmar</li>
+                <li>Genomsnittlig uppskattad tid per uppgift: {allStats.avgEstimateValue.toFixed(2)} timmar</li>
+                <li>Precision (uppskattad tid vs tid det faktiskt tog): {(allStats.avgAccuracy * 100).toFixed(0)}%</li>
+                <li>Antal röster per uppgift (snitt): {allStats.avgEstimateCount.toFixed(2)}</li>
               </ul>
             </div>
-
           ) : selectedTaskId && taskStats ? (
             <div>
               <h4>{tasks.find(t => t.id === selectedTaskId)?.taskName}</h4>
               <ul>
-                <li>Antal röster: {taskStats.totalEstimates}</li>
-                <li>Medelvärde: {taskStats.averageEstimate.toFixed(2)}</li>
-                <li>Median: {taskStats.median.toFixed(2)}</li>
-                <li>Standardavvikelse: {taskStats.stdDeviation.toFixed(2)}</li>
+                <li>Antal giltiga röster: {taskStats.totalEstimates}</li>
+                <li>Genomsnittlig gissad tid på uppgift: {taskStats.averageEstimate.toFixed(2)} timmar</li>
+                <li>Medianvärde gissad tid på uppgift: {taskStats.median.toFixed(2)} timmar</li>
+                <hr className={Styles.divider} />
+                <li>
+                  Spridning bland gissningarna: {taskStats.stdDeviation.toFixed(2)} timmar – {getSpreadLabel(taskStats.stdDeviation)}
+                </li>
+                <li>Majoriteten av gissningarna låg mellan: {Math.max(0, (taskStats.averageEstimate - taskStats.stdDeviation)).toFixed(1)} – {(taskStats.averageEstimate + taskStats.stdDeviation).toFixed(1)} timmar</li>
+                <li>{
+                  (() => {
+                    const diff = taskStats.averageEstimate - taskStats.median;
+                    if (Math.abs(diff) < 0.5) return "Snitt och median på gissningarna ligger nära varandra";
+                    if (diff > 0.5) return "Snittet påverkas av höga gissningar";
+                    return "Snittet påverkas av låga gissningar";
+                  })()
+                }</li>
               </ul>
             </div>
           ) : (
             <p>Välj en uppgift för att se statistik</p>
           )
         ) : (
-          <p>📊 Här visas visualisering</p>
+          <StatisticsGraph allStats={allStats} />
         )}
       </div>
     </div>
