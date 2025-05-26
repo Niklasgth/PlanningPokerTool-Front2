@@ -42,6 +42,15 @@ export interface TaskStatsDTO {
   stdDeviation: number;
 }
 
+export interface StatsDTO {
+  totalTasks: number;
+  totalCompletedTasks: number;
+  avgAccuracy: number;
+  avgEstimateCount: number;
+  avgActualDuration: number;
+  avgEstimateValue: number;
+}
+
 export interface CreateTaskDTO {
   taskName: string;
   taskStory: string;
@@ -72,3 +81,4 @@ export const createTaskEstimate = (taskEstimate: Omit<TaskEstimate, 'id'>) =>
 
 // === Statistik-anrop ===
 export const getStatsByTaskId = (id: string) => api.get<TaskStatsDTO>(`/api/stats/${id}`);
+export const getAllStats = () => api.get<StatsDTO>(`/api/stats`);

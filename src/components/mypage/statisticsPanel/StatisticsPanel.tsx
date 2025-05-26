@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Styles from "./StatisticsPanel.module.css";
-import { getStatsByTaskId, type Task, type TaskStatsDTO } from "../../../api/api";
+import { getStatsByTaskId, getAllStats, type Task, type TaskStatsDTO, type StatsDTO } from "../../../api/api";
 
 
 interface TaskStatsProps {
@@ -11,14 +11,21 @@ const StatisticsPanel: React.FC<TaskStatsProps> = ({ tasks }) => {
   const [activeTab, setActiveTab] = useState<"statistik" | "vis">("statistik");
   const [selectedTaskId, setSelectedTaskId] = useState<string>("");
   const [taskStats, setTaskStats] = useState<TaskStatsDTO | null>(null);
+  const [allStats, setAllStats] = useState<StatsDTO | null>(null);
 
   const handleTaskChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     const taskId = e.target.value;
     setSelectedTaskId(taskId);
+    // if 'Alla uppgifter' is selected
+    if (taskId === "all") {
+      const stats = await getAllStats();
+      setAllStats(stats.data);
+    } else {
+      setAllStats(null);
+    }
 
-    // Only fetch if a real task is selected
+    // If a task is selected
     if (taskId) {
-      // Replace this with your actual API call
       const stats = await getStatsByTaskId(taskId);
       setTaskStats(stats.data);
     } else {
@@ -47,6 +54,7 @@ const StatisticsPanel: React.FC<TaskStatsProps> = ({ tasks }) => {
         {/* <label htmlFor="task-select">Dropdown</label> */}
         <select id="task-select" value={selectedTaskId} onChange={handleTaskChange}>
           <option value="">Välj uppgift</option>
+          <option value="all">Alla uppgifter</option>
           {Array.isArray(tasks) && tasks.map((task) => (
             <option key={task.id} value={task.id}>
               {task.taskName}
@@ -57,7 +65,20 @@ const StatisticsPanel: React.FC<TaskStatsProps> = ({ tasks }) => {
 
       <div className={Styles.statsBox}>
         {activeTab === "statistik" ? (
-          selectedTaskId && taskStats ? (
+          selectedTaskId === "all" && allStats ? (
+            <div>
+              <h4>Allmän statistik</h4>
+              <ul>
+                <li>Totalt antal uppgifter: {allStats.totalTasks}</li>
+                <li>Antal avslutade uppgifter: {allStats.totalCompletedTasks}</li>
+                <li>Genomsnittlig precision: {allStats.avgAccuracy.toFixed(2)}</li>
+                <li>Genomsnittlig antal röster: {allStats.avgEstimateCount.toFixed(2)}</li>
+                <li>Genomsnittlig loggad tid: {allStats.avgActualDuration.toFixed(2)}</li>
+                <li>Genomsnittlig estimerad tid: {allStats.avgEstimateValue.toFixed(2)}</li>
+              </ul>
+            </div>
+
+          ) : selectedTaskId && taskStats ? (
             <div>
               <h4>{tasks.find(t => t.id === selectedTaskId)?.taskName}</h4>
               <ul>

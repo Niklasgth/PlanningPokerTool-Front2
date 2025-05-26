@@ -201,6 +201,7 @@ const handleEndVoteConfirm = async () => {
   const remaining = participants.filter((name) => !locked[name]);
 
   return (
+  <div className={styles.fullScreenBackground}>
     <div className={styles.container}>
       <h2 className={styles.title}>
         {loadingTask ? "Laddar..." : `Timepoker – ${task?.taskName || "Okänd uppgift"}`}
@@ -220,12 +221,12 @@ const handleEndVoteConfirm = async () => {
         )} <br />
       </div>
 
-      {/* === Inputfält och knappar för varje deltagare === */}
-      <div className={styles.participantList}>
-        {participants.map((name) => (
-          <div key={name} className={styles.participantRow}>
+      {/* === Inputfält och knappar för den inloggade användaren === */}
+      {user && (
+        <div className={styles.participantList}>
+          <div className={styles.participantRow}>
             <div className={styles.inputGroup}>
-              <span className={styles.participantName}>{name}</span>
+              <span className={styles.participantName}>{user.userName}</span>
               <input
                 type="number"
                 className={styles.input}
@@ -233,8 +234,8 @@ const handleEndVoteConfirm = async () => {
                 value={typeof times[name] === "number" ? times[name] : ""}
                 min={1}
                 max={40}
-                onChange={(e) => handleChange(name, e.target.value)}
-                disabled={locked[name] || name !== participantName}
+                onChange={(e) => handleChange(user.userName, e.target.value)}
+                disabled={locked[user.userName]}
               />
             </div>
             <div className={styles.buttonGroup}>
@@ -243,20 +244,20 @@ const handleEndVoteConfirm = async () => {
                 onClick={() => handleVote(name, times[name])}
                 disabled={locked[name] || times[name] === "pass" || name !== participantName}
               >
-                {locked[name] || times[name] == "pass" ? "🔒 Låst" : "Rösta"}
+                {locked[user.userName] || times[user.userName] == "pass" ? "🔒 Låst" : "Rösta"}
               </button>
               <button
                 className={styles.voteButton}
-                onClick={() => handleVote(name, "pass")}
-                disabled={locked[name] || name !== participantName}
+                onClick={() => handleVote(user.userName, "pass")}
+                disabled={locked[user.userName]}
               >
-                {locked[name] || times[name] === "pass" ? "🔒 Pass" : "Pass"}
+                {locked[user.userName] || times[user.userName] === "pass" ? "🔒 Pass" : "Pass"}
               </button>
             </div>
             {/* {errors[name] && <div className={styles.error}>{errors[name]}</div>} */}
           </div>
-        ))}
-      </div>
+        </div>
+      )}
 
       {/* === Resultatruta – visas när alla röstat === */}
       {allVoted && taskStats ? (
@@ -290,6 +291,7 @@ const handleEndVoteConfirm = async () => {
 )}
 
 </div> 
+
   );
 };
 
