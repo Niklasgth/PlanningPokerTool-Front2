@@ -67,7 +67,7 @@ const StatisticsPanel: React.FC<TaskStatsProps> = ({ tasks }) => {
         {activeTab === "statistik" ? (
           selectedTaskId === "all" && allStats ? (
             <div>
-              <h4>All stats</h4>
+              <h4>Allmän statistik</h4>
               <ul>
                 <li>Totalt antal uppgifter: {allStats.totalTasks}</li>
                 <li>Antal avslutade uppgifter: {allStats.totalCompletedTasks}</li>
