@@ -3,6 +3,10 @@ import { useNavigate, useParams } from "react-router-dom";
 import styles from "./PokerPage.module.css";
 import { getTaskById, getUsers, getTaskEstimates, createTaskEstimate, getStatsByTaskId } from "../../api/api";
 import type { Task, User, TaskEstimate, TaskStatsDTO } from "../../api/api";
+import EndVotePopup from "../../components/pokerPage/endVotePopup/EndVotePopup";
+import { forcePassVotes } from "../../utils/forcePassVotes";
+
+
 
 const PokerPage: React.FC = () => {
   const navigate = useNavigate();
@@ -29,6 +33,10 @@ const PokerPage: React.FC = () => {
 
   // === Backend-baserad statistik (medelvärde, median, stdDev etc) ===
   const [taskStats, setTaskStats] = useState<TaskStatsDTO | null>(null);
+
+  //== Fixar hanteringen av popup vid avslutad omröstning som ej är klar==//
+  const [showEndPopup, setShowEndPopup] = useState(false);
+
 
   // === Hämta task från backend ===
   useEffect(() => {
@@ -119,10 +127,17 @@ const PokerPage: React.FC = () => {
 
   // === Allmän för både "Rösta" och "Pass" ===
   const handleVote = async (name: string, value: number | "pass") => {
+    if (locked[name]) {
+  console.warn(`${name} har redan röstat – ignorera klick`);
+  return;
+}
+
     if (name !== participantName || !user || !task || !task.id) return;
     if (value === undefined) {
       setErrors((prev) => ({ ...prev, [name]: "Du måste ange ett tal eller pass innan du röstar." }));
       return;
+      console.log(`✅ ${name} röstar med:`, value);
+
     }
     try {
       await createTaskEstimate({ taskId: task.id, userId: user.id, estDurationHours: value === "pass" ? 0 : value });
@@ -167,6 +182,18 @@ const PokerPage: React.FC = () => {
 
   const handleLeave = () =>
     navigate("/mypage");
+
+const handleEndVoteConfirm = async () => {
+ if (!task?.id) return;
+
+  try {
+    await forcePassVotes(task.id, participants, locked);
+    navigate("/mypage");
+  } catch (err) {
+    console.error("Kunde inte avsluta omröstning:", err);
+  }
+};
+
 
   const participantName = user?.userName || "Okänd";
   const allVoted = participants.length > 0 && participants.every((name) => locked[name]);
@@ -241,12 +268,30 @@ const PokerPage: React.FC = () => {
         </div>
       ) : null}
 
-      {/* === Lämna omröstningen === */}
-      <div className={styles.controlButtons}>
-        <button className={styles.endButton} onClick={handleLeave}>Lämna omröstningen</button>
-      </div>
-    </div>
-  </div>
+ {/* === Lämna omröstningen eller Avsluta omröstningen === */}
+<div className={styles.controlButtons}>
+  <button className={styles.leaveButton} onClick={handleLeave}>
+    Lämna omröstningen
+  </button>
+
+  <button className={styles.endButton} onClick={() => setShowEndPopup(true)}>
+    Avsluta omröstning
+  </button>
+
+  <p className={styles.endInfo}>
+    Detta avslutar omröstningen för alla deltagare.
+  </p>
+</div>
+
+  {showEndPopup && (
+  <EndVotePopup
+    onConfirm={handleEndVoteConfirm}
+    onCancel={() => setShowEndPopup(false)}
+  />
+)}
+
+</div> 
+
   );
 };
 
