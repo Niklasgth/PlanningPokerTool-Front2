@@ -9,26 +9,6 @@
   margin-top: 9rem;
 }
 
-.tabHeader {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-}
-
-.tabHeader button {
-  background-color: #333;
-  color: #fff;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-.active {
-  background-color: #666;
-}
-
 .taskDropDown {
   display: flex;
   justify-content: center;
@@ -76,3 +56,36 @@
   width: 60%;
 }
 
+.tabHeader {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.tabButton {
+  background-color: #333;
+  color: #ccc;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.tabButton:hover {
+  background-color: #444;
+  color: #fff;
+}
+
+.activeStat {
+  background-color: #2196F3; 
+  color: #fff;
+}
+
+.activeVis {
+  background-color: #4CAF50; 
+  color: #fff;
+}
