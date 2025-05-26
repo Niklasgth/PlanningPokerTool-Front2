@@ -109,7 +109,8 @@ const PokerPage: React.FC = () => {
     if (locked[name]) return;
     const num = parseInt(value);
     if (isNaN(num) || num <= 0) {
-      setErrors((prev) => ({ ...prev, [name]: "Du kan inte anga negativa timmar eller välj Pass." }));
+
+      setErrors((prev) => ({ ...prev, [name]: "Du kan inte ange negativa timmar eller välj Pass." }));
       return;
     }
     setTimes((prev) => ({ ...prev, [name]: num }));
@@ -124,7 +125,7 @@ const PokerPage: React.FC = () => {
       return;
     }
     try {
-      await createTaskEstimate({ taskId: task.id, userId: user.id, estDurationHours: value === "pass" ? 0 : value, });
+      await createTaskEstimate({ taskId: task.id, userId: user.id, estDurationHours: value === "pass" ? 0 : value });
       setTimes((prev) => ({ ...prev, [name]: value }));
       setLocked((prev) => ({ ...prev, [name]: true }));
       setErrors((prev) => ({ ...prev, [name]: "" }));
