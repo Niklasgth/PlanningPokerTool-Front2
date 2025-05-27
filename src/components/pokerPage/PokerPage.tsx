@@ -278,8 +278,11 @@ const PokerPage: React.FC = () => {
     <div className={styles.fullScreenBackground}>
       <div className={styles.container}>
         <h2 className={styles.title}>
-          {loadingTask ? "Laddar..." : `Timepoker – ${task?.taskName || "Okänd uppgift"}`}
+          {loadingTask ? "Laddar..." : `Task: ${task?.taskName || "Okänd uppgift"}`}
         </h2>
+        <p className={styles.description}>
+          {loadingTask ? "Laddar..." : <span><strong>Story:</strong> {task?.taskStory || "Ingen story"}</span>}
+        </p>
         <p className={styles.description}>
           Inloggad som: <strong>{participantName}</strong>
         </p>
@@ -300,7 +303,7 @@ const PokerPage: React.FC = () => {
           <div className={styles.participantList}>
             <div className={styles.participantRow}>
               <div className={styles.inputGroup}>
-                <span className={styles.participantName}>{user.userName}</span>
+                {/* <span className={styles.participantName}>{user.userName}</span> */}
                 <input
                   type="number"
                   className={styles.input}
