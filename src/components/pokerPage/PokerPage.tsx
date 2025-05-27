@@ -221,7 +221,7 @@ const PokerPage: React.FC = () => {
           )} <br />
         </div>
 
-        {/* === Inputfält och knappar för den inloggade användare === */}
+        {/* === Inputfält och knappar för den inloggade användaren === */}
         {user && (
           <div className={styles.participantList}>
             <div className={styles.participantRow}>
