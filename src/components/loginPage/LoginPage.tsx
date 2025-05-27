@@ -14,23 +14,24 @@ const LoginPage: React.FC = () => {
 
   // Funktion som körs när vi sänder vårt login formulär
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault(); // Hindra sida från att laddas om
-
+    e.preventDefault(); // Prevent page reload
+  
     try {
-      // Anropa backend-API för att logga in användaren
       const response = await loginUser({
         userName: username,
         userPassword: password,
       });
-      //React doesn’t remember this automatically when you change routes. 
-      // By saving it to localStorage, you make that data available everywhere in the app.
-      localStorage.setItem("user", JSON.stringify(response.data));
-
+  
+      localStorage.setItem("jwtToken", response.data.token);
+      localStorage.setItem("user", JSON.stringify({
+        id: response.data.id,
+        userName: response.data.userName
+      }));
+  
       console.log('Login success:', response.data);
-      // Navigera vidare till användarens dashboard (mypage)
+  
       navigate('/mypage');
     } catch (err: any) {
-      // Visa felmeddelande om inloggningen misslyckas
       console.error('Login failed:', err);
       setError('Fel användarnamn eller lösenord');
     }
