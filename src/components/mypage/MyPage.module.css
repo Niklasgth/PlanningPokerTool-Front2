@@ -7,17 +7,17 @@
   overflow-x: hidden;
   display: flex;
   flex-direction: column; */
-    height: 100vh;
-    width: 100vw;
-    overflow-x: hidden;
-    background-image: url('/poker.png'); 
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    display: flex;
-    flex-direction: column;
-    padding: 0rem;
-    /* justify-content: center;
+  height: 100vh;
+  width: 100vw;
+  overflow-x: hidden;
+  background-image: url('/poker.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  flex-direction: column;
+  padding: 0rem;
+  /* justify-content: center;
     align-items: center; */
 }
 
@@ -31,15 +31,19 @@
 .main {
   display: flex;
   gap: 2rem;
-  height: 100%; /* viktigt om för få kolumnerna att växa jämnt */
-  align-items: stretch; /* så att båda sidor håller samma höjd */
+  height: 100%;
+  margin-left: 12vh;
+  margin-right: 12vh;
+  /* viktigt om för få kolumnerna att växa jämnt */
+  align-items: stretch;
+  /* så att båda sidor håller samma höjd */
 }
 
 .taskSection {
   flex: 2;
   background-color: #00000095;
   padding: 1rem;
-    display: flex;
+  display: flex;
   flex-direction: column;
   max-height: 100vh;
   overflow: hidden;
@@ -77,28 +81,35 @@
 .statisticsSection {
   flex: 1;
   display: flex;
+  max-height: 100%;
+  margin-top: 1rem;
   flex-direction: column;
-  overflow: hidden; /* stoppar StatisticsPanel att expanderar utanför rutan*/
+  overflow: hidden;
+  /* stoppar StatisticsPanel att expanderar utanför rutan*/
 }
+
 .taskListWrapper {
   flex-grow: 1;
   overflow-y: auto;
   max-height: 100%;
   margin-top: 1rem;
-  padding-right: 0.5rem; /* room for scrollbar */
+  padding-right: 0.5rem;
+  /* room for scrollbar */
 }
+
 .fullScreenBackground {
-    height: 100vh;
-    width: 100vw;
-    background-image: url('/poker.png'); 
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-h2{
+  height: 100vh;
+  width: 100vw;
+  background-image: url('/poker.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+h2 {
   color: white;
   display: flex;
   justify-content: center;
