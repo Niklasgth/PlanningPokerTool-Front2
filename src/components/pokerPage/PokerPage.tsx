@@ -7,7 +7,6 @@ import EndVotePopup from "../../components/pokerPage/endVotePopup/EndVotePopup";
 import { forcePassVotes } from "../../utils/forcePassVotes";
 
 
-
 const PokerPage: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
@@ -38,43 +37,32 @@ const PokerPage: React.FC = () => {
   const [showEndPopup, setShowEndPopup] = useState(false);
 
 
-  // === Hämta task från backend ===
-  // useEffect(() => {
-  //   const fetchTask = async () => {
-  //     try {
-  //       if (id) {
-  //         const response = await getTaskById(id);
-  //         // const taskData = response.data;
-  //         // setTask(taskData);
-  //         setTask(response.data);
-  //       }
-  //     } catch (error) {
-  //       console.error("Kunde inte hämta task:", error);
-  //     } finally {
-  //       setLoadingTask(false);
-  //     }
-  //   };
-  //   fetchTask();
-  // }, [id]);
+  // Fetch task and participants
+  useEffect(() => {
+    const fetchTaskAndParticipants = async () => {
+      if (!id) return;
+      const response = await getTaskById(id);
+      setTask(response.data);
 
-    useEffect(() => {
-    const fetchTask = async () => {
-      if (id) {
-        const response = await getTaskById(id);
-        setTask(response.data);
-      }
+      const usernames = Array.isArray(response.data.assignedUsers)
+        ? response.data.assignedUsers.map((u: User) => u.userName)
+        : [];
+      setParticipants(usernames);
+
       setLoadingTask(false);
     };
-    fetchTask();
+    fetchTaskAndParticipants();
   }, [id]);
 
+  // === Kolla om användaren är inloggad, annars redirect ===
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) setUser(JSON.parse(storedUser));
     else navigate("/");
   }, [navigate]);
 
-    useEffect(() => {
+  // need to combine with useEffect below it
+  useEffect(() => {
     const fetchEstimatesAndStats = async () => {
       if (!id || !user) return;
       try {
@@ -105,39 +93,6 @@ const PokerPage: React.FC = () => {
     };
     fetchEstimatesAndStats();
   }, [id, user, task]);
-
-  // === Hämta användarlista från backend ===
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        // const res = await getUsers();
-        // const usernames = res.data.map((u: User) => u.userName);
-        // setParticipants(usernames);
-        if (id) {
-          const taskRes = await getTaskById(id);
-          setTask(taskRes.data);
-            const usernames = Array.isArray(taskRes.data.assignedUsers)
-          ? taskRes.data.assignedUsers.map((u: User) => u.userName)
-          : [];
-        setParticipants(usernames);
-        }
-      } catch (error) {
-        console.error("Kunde inte hämta användare:", error);
-      }
-    };
-    fetchUsers();
-  }, [id]);
-
-  // === Kolla om användaren är inloggad, annars redirect ===
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      const parsed = JSON.parse(storedUser);
-      setUser(parsed);
-    } else {
-      navigate("/");
-    }
-  }, [navigate]);
 
   // === Hämta tidigare estimates + statistik från backend ===
   useEffect(() => {
@@ -195,7 +150,6 @@ const PokerPage: React.FC = () => {
     if (value === undefined) {
       setErrors((prev) => ({ ...prev, [name]: "Du måste ange ett tal eller pass innan du röstar." }));
       return;
-      console.log(`✅ ${name} röstar med:`, value);
 
     }
     try {
@@ -207,37 +161,6 @@ const PokerPage: React.FC = () => {
       setErrors((prev) => ({ ...prev, [name]: "Kunde inte spara röst." }));
     }
   };
-
-  // === När användaren klickar "Rösta" (låser sin uppskattning) ===
-  // const handleLockVote = async (name: string) => {
-  //   if (name !== participantName || !user || !task || !task.id) return;
-  //   const value = times[name];
-  //   if (value === undefined || typeof value !== "number") {
-  //     setErrors((prev) => ({ ...prev, [name]: "Du måste ange ett värde eller välja Pass." }));
-  //     return;
-  //   }
-  //   try {
-  //     await createTaskEstimate({ taskId: task.id, userId: user.id, estDurationHours: value });
-  //     setLocked((prev) => ({ ...prev, [name]: true }));
-  //     setErrors((prev) => ({ ...prev, [name]: "" }));
-  //   } catch (err) {
-  //     setErrors((prev) => ({ ...prev, [name]: "Kunde inte spara röst." }));
-  //   }
-  // };
-
-  // === När användaren klickar "Pass" (avstår att rösta) ===
-  // const handlePass = async (name: string) => {
-  //   if (name !== participantName || !user || !task || !task.id) return;
-  //   try {
-  //     await createTaskEstimate({ taskId: task.id, userId: user.id, estDurationHours: 0 });
-  //     setTimes((prev) => ({ ...prev, [name]: "pass" }));
-  //     setLocked((prev) => ({ ...prev, [name]: true }));
-  //     setErrors((prev) => ({ ...prev, [name]: "" }));
-  //   } catch (err) {
-  //     setErrors((prev) => ({ ...prev, [name]: "Kunde inte spara pass." }));
-  //   }
-  // };
-
 
   const handleLeave = () =>
     navigate("/mypage");
@@ -253,13 +176,11 @@ const PokerPage: React.FC = () => {
     }
   };
 
-
   const participantName = user?.userName || "Okänd";
   const assignedUsers = task?.assignedUsers || [];
-  // const assignedUserNames = assignedUsers.map(u => u.userName);
   const userIsAssigned = assignedUsers.some(u => u.id === user?.id);
 
-      if (!userIsAssigned) {
+  if (!userIsAssigned) {
     return <div className={styles.fullScreenBackground}>
       <div className={styles.container}>
         <h2 className={styles.title}>{task?.taskName}</h2>
@@ -271,8 +192,6 @@ const PokerPage: React.FC = () => {
   const allVoted = participants.length > 0 && participants.every((name) => locked[name]);
   const votedCount = Object.values(locked).filter(Boolean).length;
   const remaining = participants.filter((name) => !locked[name]);
-
-
 
   return (
     <div className={styles.fullScreenBackground}>
@@ -331,7 +250,6 @@ const PokerPage: React.FC = () => {
                   {locked[user.userName] || times[user.userName] === "pass" ? "🔒 Pass" : "Pass"}
                 </button>
               </div>
-              {/* {errors[name] && <div className={styles.error}>{errors[name]}</div>} */}
             </div>
           </div>
         )}

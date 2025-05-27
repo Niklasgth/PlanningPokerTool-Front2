@@ -3,7 +3,6 @@ import Styles from "./StatisticsPanel.module.css";
 import { getStatsByTaskId, getAllStats, type Task, type TaskStatsDTO, type StatsDTO } from "../../../api/api";
 import StatisticsGraph from "./StatisticsGraph";
 import TaskStatsGraph from "./TaskStatsGraph";
-import { all } from "axios";
 
 interface TaskStatsProps {
   tasks: Task[];
