@@ -1,8 +1,8 @@
-import React, { useState,useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Styles from "./TaskCard.module.css";
-import type  { TaskEstimate,Task } from "../../../api/api";
-import { updateTask,getTaskEstimates } from "../../../api/api";
+import type { Task } from "../../../api/api";
+import { updateTask } from "../../../api/api";
 
 interface TaskCardProps {
   task: Task;
@@ -10,70 +10,59 @@ interface TaskCardProps {
 
 const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
   const navigate = useNavigate();
-  const [hasVoted, setHasVoted] = useState(false);
-  const currentUserId = localStorage.getItem("user")
-  ? JSON.parse(localStorage.getItem("user")!).id
-  : null;
+
+  const userStr = localStorage.getItem("user");
+  const currentUserId = userStr ? JSON.parse(userStr).id : null;
+
+  const isAssigned = currentUserId && Array.isArray(task.assignedUsers)
+    ? task.assignedUsers.some((user) => user.id === currentUserId)
+    : false;
 
   const [durationLogged, setDurationLogged] = useState<boolean>(!!task.taskDuration);
   const [duration, setDuration] = useState<number | undefined>(task.taskDuration);
-  const [inputValue, setInputValue] = useState<string>(""); // temporärt inputfält
+  const [inputValue, setInputValue] = useState<string>("");
   const [error, setError] = useState<string>("");
 
-    useEffect(() => {
-    if (!task.id || !currentUserId) return;
-    getTaskEstimates()
-      .then(res => {
-        const estimates: TaskEstimate[] = res.data;
-        setHasVoted(
-          estimates.some(e => e.taskId === task.id && e.userId === currentUserId)
-        );
-      })
-      .catch(console.error);
-  }, [task.id, currentUserId]);
-
-  // === Navigera till pokerpage med rätt task-id ===
   const handlePokerClick = () => {
     navigate(`/pokerpage/${task.id}`);
   };
 
-// === Skicka tid till backend ===
-const handleLogTime = async () => {
-  const parsed = parseFloat(inputValue);
-  if (isNaN(parsed) || parsed <= 0) {
-    setError("Ange ett giltigt antal timmar > 0");
-    return;
-  }
+  const handleLogTime = async () => {
+    const parsed = parseFloat(inputValue);
+    if (isNaN(parsed) || parsed <= 0) {
+      setError("Ange ett giltigt antal timmar > 0");
+      return;
+    }
 
-  if (!task.id) return;
+    if (!task.id) return;
 
-  try {
-    const response = await updateTask(task.id, { taskDuration: parsed });
-    setDuration(parsed);
-    setDurationLogged(true);
-    setError("");
-  } catch (err) {
-    setError("Något gick fel vid sparande");
-    console.error("Loggning misslyckades:", err);
-  }
-};
+    try {
+      await updateTask(task.id, { taskDuration: parsed });
+      setDuration(parsed);
+      setDurationLogged(true);
+      setError("");
+    } catch (err) {
+      setError("Något gick fel vid sparande");
+      console.error("Loggning misslyckades:", err);
+    }
+  };
 
-const handleAddUser = (taskId: string) => {
-  navigate(`/assign-users/${taskId}`);
-};
+  const handleAddUser = (taskId: string) => {
+    navigate(`/assign-users/${taskId}`);
+  };
 
   return (
     <div className={Styles.card}>
       <span>{task.taskName}</span>
       <div className={Styles.actions}>
-        {/* <button onClick={handlePokerClick}>Poker</button> */}
-        <button onClick={() => task.id && handleAddUser(task.id)}> Lägg till användare</button>
+        <button onClick={() => task.id && handleAddUser(task.id)}>Lägg till användare</button>
 
         <button
           onClick={handlePokerClick}
-          disabled={hasVoted}
-          >
-          {hasVoted ? "🔒 Låst" : "Poker"}
+          disabled={!isAssigned}
+          title={!isAssigned ? "Du är inte tilldelad denna task" : "Gå till Poker"}
+        >
+          {!isAssigned ? "🚫 Ej tilldelad" : "Poker"}
         </button>
 
         {durationLogged ? (
