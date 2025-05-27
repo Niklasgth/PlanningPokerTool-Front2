@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getUsers, getTaskById, assignUsersToTask } from "../../api/api";
 import type { User } from "../../api/api";
+import styles from "./AssignUsersPage.module.css";
 
 const AssignUsersPage: React.FC = () => {
   const { taskId } = useParams<{ taskId: string }>();
@@ -31,25 +32,30 @@ const AssignUsersPage: React.FC = () => {
   };
 
   return (
-    <div style={{ padding: 24 }}>
-      <h2>Lägg till användare för: {taskName}</h2>
-      <ul>
-        {users.map(user => (
-          <li key={user.id}>
-            <label>
-              <input
-                type="checkbox"
-                checked={selected.includes(user.id)}
-                onChange={() => handleToggle(user.id)}
-              />
-              {user.userName}
-            </label>
-          </li>
-        ))}
-      </ul>
-      <button onClick={handleSave}>Spara</button>
+  <div className={styles.fullScreenBackground}>
+    <div className={styles.pageWrapper}>
+      <div className={styles.contentBox}>
+        <h2 className={styles.header}>Lägg till användare för: {taskName}</h2>
+        <ul className={styles.userList}>
+          {users.map(user => (
+            <li key={user.id}>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={selected.includes(user.id)}
+                  onChange={() => handleToggle(user.id)}
+                />
+                {user.userName}
+              </label>
+            </li>
+          ))}
+        </ul>
+        <button className={styles.saveButton} onClick={handleSave}>Spara</button>
+      </div>
     </div>
-  );
+  </div>
+);
+
 };
 
 export default AssignUsersPage;
