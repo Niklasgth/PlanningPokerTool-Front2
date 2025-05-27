@@ -37,32 +37,38 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
     navigate(`/pokerpage/${task.id}`);
   };
 
-  // === Skicka tid till backend ===
-  const handleLogTime = async () => {
-    const parsed = parseFloat(inputValue);
-    if (isNaN(parsed) || parsed <= 0) {
-      setError("Ange ett giltigt antal timmar > 0");
-      return;
-    }
+// === Skicka tid till backend ===
+const handleLogTime = async () => {
+  const parsed = parseFloat(inputValue);
+  if (isNaN(parsed) || parsed <= 0) {
+    setError("Ange ett giltigt antal timmar > 0");
+    return;
+  }
 
-    if (!task.id) return;
+  if (!task.id) return;
 
-    try {
-      const response = await updateTask(task.id, { taskDuration: parsed });
-      setDuration(parsed);
-      setDurationLogged(true);
-      setError("");
-    } catch (err) {
-      setError("Något gick fel vid sparande");
-      console.error("Loggning misslyckades:", err);
-    }
-  };
+  try {
+    const response = await updateTask(task.id, { taskDuration: parsed });
+    setDuration(parsed);
+    setDurationLogged(true);
+    setError("");
+  } catch (err) {
+    setError("Något gick fel vid sparande");
+    console.error("Loggning misslyckades:", err);
+  }
+};
+
+const handleAddUser = (taskId: string) => {
+  navigate(`/assign-users/${taskId}`);
+};
 
   return (
     <div className={Styles.card}>
       <span>{task.taskName}</span>
       <div className={Styles.actions}>
         {/* <button onClick={handlePokerClick}>Poker</button> */}
+        <button onClick={() => task.id && handleAddUser(task.id)}> Lägg till användare</button>
+
         <button
           onClick={handlePokerClick}
           disabled={hasVoted}

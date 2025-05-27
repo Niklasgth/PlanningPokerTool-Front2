@@ -13,7 +13,8 @@ export interface Task {
   taskName: string;
   taskStory?: string;
   taskDuration?: number;
-  assignedUserId?: string;
+  // assignedUserId?: string;
+  assignedUsers: User[];
 }
 
 export interface User {
@@ -82,3 +83,8 @@ export const createTaskEstimate = (taskEstimate: Omit<TaskEstimate, 'id'>) =>
 // === Statistik-anrop ===
 export const getStatsByTaskId = (id: string) => api.get<TaskStatsDTO>(`/api/stats/${id}`);
 export const getAllStats = () => api.get<StatsDTO>(`/api/stats`);
+
+// To export assignUsersToTask
+export const assignUsersToTask = async (taskId: string, userIds: string[]) => {
+  return api.put(`/api/${taskId}/assign-users`, userIds); // matches your backend @PutMapping("/{id}/assign-users")
+};
