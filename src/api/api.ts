@@ -2,6 +2,7 @@ import axios from "axios";
 
 // === Skapa Axios-instans ===
 export const api = axios.create({
+
   baseURL: "https://seahorse-app-xeebi.ondigitalocean.app",
 });
 
