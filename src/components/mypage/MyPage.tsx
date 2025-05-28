@@ -29,7 +29,7 @@ const MyPage: React.FC = () => {
     <div className={Styles.myPageContainer}>
       <div className={Styles.main}>
         <div className={Styles.taskSection}>
-                  <LogOutButton />
+          <LogOutButton />
 
           <h2>Uppgifter i projektet</h2>
 
@@ -49,7 +49,6 @@ const MyPage: React.FC = () => {
           <div className={Styles.taskListWrapper}>
             <TaskList tasks={tasks} />
           </div>
-          {/* <TaskList tasks={tasks} /> */}
         </div>
 
         <div className={Styles.statisticsSection}>
