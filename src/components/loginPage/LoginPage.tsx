@@ -3,34 +3,34 @@ import { useNavigate } from 'react-router-dom';
 import { loginUser } from '../../api/api';
 import styles from './LoginPage.module.css';
 
-// LoginPage-sidan/komponenten vilken hanterar vår användarinlogg
 const LoginPage: React.FC = () => {
-  // Lokalt state för användarnamn, lösenord och eventuellt felmeddelande
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const navigate = useNavigate(); // Navigeringsfunktion från react-router
+  const navigate = useNavigate();
 
-  // Funktion som körs när vi sänder vårt login formulär
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault(); // Hindra sida från att laddas om
+    e.preventDefault();
 
     try {
-      // Anropa backend-API för att logga in användaren
       const response = await loginUser({
         userName: username,
         userPassword: password,
       });
-      //React doesn’t remember this automatically when you change routes. 
-      // By saving it to localStorage, you make that data available everywhere in the app.
-      localStorage.setItem("user", JSON.stringify(response.data));
+
+      const { token, userId, userName } = response.data;
+
+      localStorage.setItem("jwtToken", token);
+      localStorage.setItem("user", JSON.stringify({
+        id: userId,
+        userName: userName
+      }));
 
       console.log('Login success:', response.data);
-      // Navigera vidare till användarens dashboard (mypage)
+
       navigate('/mypage');
     } catch (err: any) {
-      // Visa felmeddelande om inloggningen misslyckas
       console.error('Login failed:', err);
       setError('Fel användarnamn eller lösenord');
     }
@@ -42,8 +42,6 @@ const LoginPage: React.FC = () => {
         <h1 className={styles.loginHeader}>Welcome to Poker Game</h1>
         <div className={styles.loginBox}>
           <h2 className={styles.formTitle}>Logga in</h2>
-
-          {/* Formulär för inloggning */}
           <form className={styles.loginForm} onSubmit={handleLogin}>
             <label>
               Användarnamn:
@@ -66,14 +64,10 @@ const LoginPage: React.FC = () => {
               />
             </label>
 
-            {/* Visar felmeddelande om inloggning misslyckas */}
             {error && <p style={{ color: 'red' }}>{error}</p>}
 
             <div className={styles.actions}>
-              {/* Knapp för att skicka inloggningsformuläret */}
               <button type="submit">Logga in</button>
-
-              {/* Knapp för att navigera till registreringssidan */}
               <button type="button" onClick={() => navigate('/register')}>
                 Registrera dig
               </button>

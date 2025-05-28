@@ -1,0 +1,67 @@
+.fullScreenBackground {
+  height: 100vh;
+  width: 100vw;
+  background-image: url('/poker.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pageWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.0);
+  padding: 2rem;
+  width: 100%;
+  max-width: 600px;
+}
+
+.contentBox {
+  background-color: rgba(255, 255, 255, 0.45);
+  border-radius: 8px;
+  padding: 2rem;
+  width: 100%;
+  color: black;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.header {
+  font-size: 2rem;
+  color: white;
+  margin-bottom: 1.5rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+  text-align: center;
+}
+
+.userList {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 1.5rem;
+}
+
+.userList li {
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+}
+
+.userList input {
+  margin-right: 0.5rem;
+}
+
+.saveButton {
+  padding: 0.7rem;
+  font-size: 1rem;
+  background-color: #000;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.saveButton:hover {
+  background-color: #333;
+}

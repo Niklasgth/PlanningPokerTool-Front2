@@ -1,92 +1,91 @@
 .panel {
-  background-color: #111;
-  color: white;
+  background-color: #11111190;
   padding: 1rem;
-  padding-top: 1rem;
-  border-radius: 0.5rem;
-  border: 1px solid #333;
   height: 100%;
+  color: #f0f0f0;
   display: flex;
   flex-direction: column;
-  box-sizing: border-box;
-  width: 100%;
+  gap: 1rem;
+  margin-top: 9rem;
+}
+
+.taskDropDown {
+  display: flex;
+  justify-content: center;
+}
+
+.taskDropDown select {
+  padding: 0.5rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background-color: #222;
+  color: #fff;
+}
+
+.statsBox {
+  background-color: #1c1c1c;
+  border-radius: 1rem;
+  padding: 2rem;
+  text-align: center;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.statsBox h4 {
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  color: #ffffff;
+}
+
+.statsBox ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.statsBox li {
+  margin: 0.5rem 0;
+  font-size: 1rem;
+  color: #ddd;
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid #444;
+  margin: 1rem auto;
+  width: 60%;
 }
 
 .tabHeader {
   display: flex;
-  gap: 0.5rem;
-  width: 100%;
-}
-
-.tabHeader button {
-  /* flex: 1; */
-  /* låt båda knapparna ta lika stor plats */
-  /* min-width: 0; */
-  padding: 0.6rem 1rem;
-
-  font-size: 0.9rem;
-  line-height: 1.2;
-  font-weight: bold;
-
-  background-color: #333;
-  color: white;
-  border: none;
-  border-radius: 0.4rem;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-
-  white-space: normal;
-  overflow: visible;
-  text-overflow: unset;
-  text-align: center;
-}
-
-
-
-.tabHeader button:hover {
-  background-color: #444;
-}
-
-.active {
-  background-color: #e1ab52;
-  color: black;
-}
-
-label {
-  margin-bottom: 0.5rem;
-  display: block;
-}
-
-select {
-  width: 100%;
-  padding: 0.5rem;
-  background-color: #222;
-  color: white;
-  border: 1px solid #444;
-  border-radius: 0.3rem;
+  justify-content: center;
+  gap: 1rem;
   margin-bottom: 1rem;
 }
 
-.statsBox {
-  flex-grow: 1;
-  border: 1px solid #444;
-  padding: 1rem;
-  color: black;
-  background-color: #dadada;
-  border-radius: 0.3rem;
-  display: flex;
-  justify-content: right;
-  align-items: left;
-  text-align: center;
+.tabButton {
+  background-color: #333;
+  color: #ccc;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: background-color 0.3s, color 0.3s;
 }
 
-.taskDropDown {
-  padding-top: 1rem;
+.tabButton:hover {
+  background-color: #444;
+  color: #fff;
 }
 
-li {
-  font-size: 0.9rem;
-  list-style-type: none;
-  text-align: left;
+.activeStat {
+  background-color: #2196F3; 
+  color: #fff;
+}
 
+.activeVis {
+  background-color: #4CAF50; 
+  color: #fff;
 }
