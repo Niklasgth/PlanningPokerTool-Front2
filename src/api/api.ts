@@ -2,19 +2,19 @@ import axios from "axios";
 
 // === Skapa Axios-instans ===
 export const api = axios.create({
-  baseURL: "http://localhost:8080",
+  baseURL: "https://seahorse-app-xeebi.ondigitalocean.app",
 });
 
 // === Interceptor: Lägg till JWT-token i varje request ===
 api.interceptors.request.use(config => {
   const token = localStorage.getItem("jwtToken");
-  console.log("⏱ Sending request to:", config.url);
-  console.log("🔐 Token present?", !!token);
+  console.log("Sending request to:", config.url);
+  console.log("Token present?", !!token);
 
   if (token) {
     if (!config.headers) config.headers = {};
     config.headers.Authorization = `Bearer ${token}`;
-    console.log("📤 Authorization header:", config.headers.Authorization);
+    console.log("Authorization header:", config.headers.Authorization);
   }
 
   return config;
